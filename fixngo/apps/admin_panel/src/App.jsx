@@ -48,7 +48,7 @@ function Orders() {
               <tr><td colSpan="5" style={{ textAlign: 'center', color: 'var(--text-muted)' }}>No orders found.</td></tr>
             ) : (
               orders.map(order => (
-                <React.Fragment key={order._id || Math.random()}>
+                <React.Fragment key={order._id || `order-${orders.indexOf(order)}`}>
                   <tr>
                     <td style={{ fontFamily: 'monospace' }}>{order._id?.toString().substring(0,8) || 'N/A'}...</td>
                     <td>

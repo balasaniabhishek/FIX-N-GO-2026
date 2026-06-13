@@ -345,19 +345,11 @@ class _FindingTechScreenState extends State<FindingTechScreen>
 }
 
 class _TechMarker extends StatelessWidget {
-  final double? top;
-  final double? bottom;
-  final double? left;
-  final double? right;
   final String name;
   final bool isActive;
   final int delay;
 
   const _TechMarker({
-    this.top,
-    this.bottom,
-    this.left,
-    this.right,
     required this.name,
     required this.isActive,
     required this.delay,
@@ -365,38 +357,32 @@ class _TechMarker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Positioned(
-      top: top,
-      bottom: bottom,
-      left: left,
-      right: right,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 500),
-        width: 44,
-        height: 44,
-        decoration: BoxDecoration(
-          color: isActive
-              ? AppColors.brandBlue.withValues(alpha: 0.9)
-              : Theme.of(context).colorScheme.surface.withValues(alpha: 0.85),
-          shape: BoxShape.circle,
-          border: Border.all(
-            color: isActive ? AppColors.brandBlue : Theme.of(context).colorScheme.outline,
-            width: 2,
-          ),
-          boxShadow: isActive
-              ? [
-                  BoxShadow(
-                    color: AppColors.brandBlue.withValues(alpha: 0.5),
-                    blurRadius: 16,
-                    spreadRadius: 2,
-                  )
-                ]
-              : [],
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 500),
+      width: 44,
+      height: 44,
+      decoration: BoxDecoration(
+        color: isActive
+            ? AppColors.brandBlue.withValues(alpha: 0.9)
+            : Theme.of(context).colorScheme.surface.withValues(alpha: 0.85),
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: isActive ? AppColors.brandBlue : Theme.of(context).colorScheme.outline,
+          width: 2,
         ),
-        child: Center(
-          child: Icon(Icons.person_rounded,
-              color: isActive ? Colors.white : AppColors.textMuted, size: 22),
-        ),
+        boxShadow: isActive
+            ? [
+                BoxShadow(
+                  color: AppColors.brandBlue.withValues(alpha: 0.5),
+                  blurRadius: 16,
+                  spreadRadius: 2,
+                )
+              ]
+            : [],
+      ),
+      child: Center(
+        child: Icon(Icons.person_rounded,
+            color: isActive ? Colors.white : AppColors.textMuted, size: 22),
       ),
     );
   }
