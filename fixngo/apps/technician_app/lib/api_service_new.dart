@@ -324,12 +324,12 @@ class ApiService {
         await saveToken(data['token'] as String);
         return data;
       } else {
+        String errorMessage = 'Registration failed (Code ${res.statusCode})';
         try {
           final errorData = jsonDecode(res.body);
-          throw Exception(errorData['message'] ?? 'Registration failed');
-        } catch (e) {
-          throw Exception('Registration failed (Code ${res.statusCode})');
-        }
+          errorMessage = errorData['message'] ?? errorMessage;
+        } catch (_) {}
+        throw Exception(errorMessage);
       }
     } catch (e) {
       throw Exception(e.toString().replaceAll('Exception: ', ''));

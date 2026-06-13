@@ -89,6 +89,7 @@ class _TrackTechnicianScreenState extends State<TrackTechnicianScreen>
   void dispose() {
     _socketService.off('order-updated');
     _socketService.off('technician-location');
+    _moveController.dispose();
     _pulseController.dispose();
     super.dispose();
   }

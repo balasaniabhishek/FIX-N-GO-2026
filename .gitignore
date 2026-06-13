@@ -42,3 +42,12 @@ fixngo/backend/mongodb_data/
 fixngo/apps/technician_app/analyze_output*.txt
 fixngo/apps/technician_app/*.py
 fixngo/apps/technician_app/flutter_version.txt
+
+# Build artifacts / CMake caches
+fixngo/apps/build_locked_*/
+**/.cxx/
+
+# Generated iOS / Flutter ephemeral files
+**/ios/Flutter/Generated.xcconfig
+**/ios/Flutter/flutter_export_environment.sh
+**/ios/Flutter/ephemeral/
