@@ -15,9 +15,13 @@ const withdrawalSchema = mongoose.Schema(
       type: String,
       required: true,
     },
+    payoutGatewayId: {
+      type: String,
+      default: '',
+    },
     status: {
       type: String,
-      enum: ['pending', 'approved', 'rejected', 'completed'],
+      enum: ['pending', 'processing', 'completed', 'failed', 'reversed', 'approved', 'rejected'],
       default: 'pending',
     },
     processedAt: {

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'config/api_config.dart';
@@ -47,10 +48,13 @@ class ApiService {
         final data = jsonDecode(response.body);
         await saveToken(data['token']);
         return true;
+      } else {
+        final errorData = jsonDecode(response.body);
+        throw Exception(errorData['message'] ?? 'Invalid credentials');
       }
-      return false;
     } catch (e) {
-      return false;
+      if (e is Exception) rethrow;
+      throw Exception('Connection failed');
     }
   }
 
@@ -80,6 +84,15 @@ class ApiService {
   Future<Map<String, dynamic>?> getDashboard() async {
     try {
       final res = await http.get(Uri.parse('$apiBaseUrl/tech/dashboard'), headers: await _getHeaders());
+      return jsonDecode(res.body);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future<Map<String, dynamic>?> getProfile() async {
+    try {
+      final res = await http.get(Uri.parse('$apiBaseUrl/tech/profile'), headers: await _getHeaders());
       return jsonDecode(res.body);
     } catch (e) {
       return null;
@@ -147,6 +160,42 @@ class ApiService {
     }
   }
 
+  Future<bool> updateProfile({String? name, String? phone, String? email}) async {
+    try {
+      final res = await http.patch(
+        Uri.parse('$apiBaseUrl/auth/profile'),
+        headers: await _getHeaders(),
+        body: jsonEncode({
+          if (name != null) 'name': name,
+          if (phone != null) 'phone': phone,
+          if (email != null) 'email': email,
+        }),
+      );
+      return res.statusCode == 200;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<bool> updateBankDetails({required String accountName, required String accountNumber, required String ifscCode}) async {
+    try {
+      final res = await http.patch(
+        Uri.parse('$apiBaseUrl/tech/profile'),
+        headers: await _getHeaders(),
+        body: jsonEncode({
+          'bankDetails': {
+            'accountName': accountName,
+            'accountNumber': accountNumber,
+            'ifscCode': ifscCode,
+          }
+        }),
+      );
+      return res.statusCode == 200;
+    } catch (e) {
+      return false;
+    }
+  }
+
   Future<List<dynamic>> getMyJobs() async {
     try {
       final res = await http.get(Uri.parse('$apiBaseUrl/tech/jobs?status=active'), headers: await _getHeaders());
@@ -165,9 +214,26 @@ class ApiService {
     }
   }
 
-  Future<bool> completeJob(String orderId) async {
+  Future<bool> updateChecklist(String orderId, List<Map<String, dynamic>> checklist) async {
     try {
-      final res = await http.post(Uri.parse('$apiBaseUrl/tech/jobs/$orderId/complete'), headers: await _getHeaders());
+      final res = await http.patch(
+        Uri.parse('$apiBaseUrl/tech/jobs/$orderId/checklist'),
+        headers: await _getHeaders(),
+        body: jsonEncode({'checklist': checklist}),
+      );
+      return res.statusCode == 200;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<bool> completeJob(String orderId, String otp) async {
+    try {
+      final res = await http.post(
+        Uri.parse('$apiBaseUrl/orders/$orderId/complete'),
+        headers: await _getHeaders(),
+        body: jsonEncode({'otp': otp}),
+      );
       return res.statusCode == 200;
     } catch (e) {
       return false;
@@ -274,10 +340,16 @@ class ApiService {
         final data = jsonDecode(res.body) as Map<String, dynamic>;
         await saveToken(data['token'] as String);
         return data;
+      } else {
+        try {
+          final errorData = jsonDecode(res.body);
+          throw Exception(errorData['message'] ?? 'Registration failed');
+        } catch (e) {
+          throw Exception('Registration failed (Code ${res.statusCode})');
+        }
       }
-      return null;
     } catch (e) {
-      return null;
+      throw Exception(e.toString().replaceAll('Exception: ', ''));
     }
   }
 
@@ -299,8 +371,8 @@ class ApiService {
 
   Future<Map<String, dynamic>?> uploadTechnicianKyc({
     required String aadhaarNumber,
-    required String frontPath,
-    required String backPath,
+    required XFile frontFile,
+    required XFile backFile,
   }) async {
     try {
       final token = await getToken();
@@ -309,8 +381,12 @@ class ApiService {
       final request = http.MultipartRequest('PUT', Uri.parse('$apiBaseUrl/technician-profile/profile/kyc'));
       request.headers['Authorization'] = 'Bearer $token';
       request.fields['aadharNumber'] = aadhaarNumber;
-      request.files.add(await http.MultipartFile.fromPath('aadharFront', frontPath));
-      request.files.add(await http.MultipartFile.fromPath('aadharBack', backPath));
+
+      // Use fromBytes for cross-platform compatibility (works on Web + Mobile)
+      final frontBytes = await frontFile.readAsBytes();
+      final backBytes = await backFile.readAsBytes();
+      request.files.add(http.MultipartFile.fromBytes('aadharFront', frontBytes, filename: frontFile.name));
+      request.files.add(http.MultipartFile.fromBytes('aadharBack', backBytes, filename: backFile.name));
 
       final streamed = await request.send();
       final body = await streamed.stream.bytesToString();
@@ -350,9 +426,9 @@ class ApiService {
     }
   }
 
-  Future<bool> updateOrderStatus(String orderId, String status) async {
-    if (status == 'completed') {
-      return completeJob(orderId);
+  Future<bool> updateOrderStatus(String orderId, String status, {String? otp}) async {
+    if (status == 'completed' && otp != null) {
+      return completeJob(orderId, otp);
     } else if (status == 'in_progress' || status == 'started') {
       return startJob(orderId);
     }

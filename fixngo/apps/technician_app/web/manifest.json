@@ -1,11 +1,11 @@
 {
-    "name": "fixngo_technician",
-    "short_name": "fixngo_technician",
+    "name": "Fix-N-Go Technician",
+    "short_name": "Fixer",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "transparent",
+    "theme_color": "#E53935",
+    "description": "Fix-N-Go Technician - Manage jobs, track earnings, and serve customers on demand.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

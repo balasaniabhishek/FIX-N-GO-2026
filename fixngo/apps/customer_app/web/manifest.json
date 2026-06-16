@@ -1,11 +1,11 @@
 {
-    "name": "fixngo_customer",
-    "short_name": "fixngo_customer",
+    "name": "Fix-N-Go Customer",
+    "short_name": "Fix-N-Go",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "transparent",
+    "theme_color": "#1A56F0",
+    "description": "Fix-N-Go - Book mobile phone repair technicians on demand. Fast, reliable doorstep service.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

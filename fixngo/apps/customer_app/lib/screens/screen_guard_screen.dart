@@ -62,40 +62,40 @@ class _ScreenGuardScreenState extends State<ScreenGuardScreen> {
     final selected = guardTypes.firstWhere((g) => g['name'] == selectedGuard);
 
     return Scaffold(
-      backgroundColor: AppColors.bgDark,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: AppColors.bgDark,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         leading: GestureDetector(
           onTap: () => Navigator.pop(context),
           child: Container(
-            margin: const EdgeInsets.all(8),
+            margin: EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: AppColors.bgCard,
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: AppColors.borderColor),
+              border: Border.all(color: Theme.of(context).colorScheme.outline),
             ),
-            child: const Icon(Icons.arrow_back_ios_new_rounded,
-                size: 16, color: AppColors.textPrimary),
+            child: Icon(Icons.arrow_back_ios_new_rounded,
+                size: 16, color: Theme.of(context).colorScheme.onSurface),
           ),
         ),
         title: Text(
           'Choose guard type',
           style: GoogleFonts.poppins(
-              fontSize: 20, fontWeight: FontWeight.w700, color: AppColors.textWhite),
+              fontSize: 20, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
         ),
       ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(20),
+          padding: EdgeInsets.all(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: AppColors.bgCard,
+                  color: Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: AppColors.borderColor),
+                  border: Border.all(color: Theme.of(context).colorScheme.outline),
                 ),
                 child: Text(
                   widget.device,
@@ -106,7 +106,7 @@ class _ScreenGuardScreenState extends State<ScreenGuardScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 20),
               Expanded(
                 child: GridView.builder(
                   physics: const NeverScrollableScrollPhysics(),
@@ -124,16 +124,16 @@ class _ScreenGuardScreenState extends State<ScreenGuardScreen> {
                       onTap: () => setState(() => selectedGuard = g['name'] as String),
                       child: AnimatedContainer(
                         duration: const Duration(milliseconds: 200),
-                        padding: const EdgeInsets.all(16),
+                        padding: EdgeInsets.all(16),
                         decoration: BoxDecoration(
                           color: isSelected
                               ? (g['color'] as Color).withValues(alpha: 0.15)
-                              : AppColors.bgCard,
+                              : Theme.of(context).colorScheme.surface,
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
                             color: isSelected
                                 ? (g['color'] as Color)
-                                : AppColors.borderColor,
+                                : Theme.of(context).colorScheme.outline,
                             width: isSelected ? 2 : 1,
                           ),
                           boxShadow: isSelected
@@ -162,7 +162,7 @@ class _ScreenGuardScreenState extends State<ScreenGuardScreen> {
                                 const Spacer(),
                                 if (g['popular'] as bool)
                                   Container(
-                                    padding: const EdgeInsets.symmetric(
+                                    padding: EdgeInsets.symmetric(
                                         horizontal: 6, vertical: 2),
                                     decoration: BoxDecoration(
                                       color: AppColors.brandGreen.withValues(alpha: 0.2),
@@ -183,7 +183,7 @@ class _ScreenGuardScreenState extends State<ScreenGuardScreen> {
                               style: GoogleFonts.poppins(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w700,
-                                color: AppColors.textWhite,
+                                color: AppColors.textPrimary,
                               ),
                             ),
                             Text(
@@ -193,7 +193,7 @@ class _ScreenGuardScreenState extends State<ScreenGuardScreen> {
                                 color: AppColors.textMuted,
                               ),
                             ),
-                            const SizedBox(height: 4),
+                            SizedBox(height: 4),
                             Text(
                               '₹${g['price']}',
                               style: GoogleFonts.poppins(
@@ -209,10 +209,10 @@ class _ScreenGuardScreenState extends State<ScreenGuardScreen> {
                   },
                 ),
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.all(14),
+                padding: EdgeInsets.all(14),
                 decoration: BoxDecoration(
                   color: AppColors.brandGreen.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(12),
@@ -220,9 +220,8 @@ class _ScreenGuardScreenState extends State<ScreenGuardScreen> {
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.check_circle_rounded,
-                        color: AppColors.brandGreen, size: 20),
-                    const SizedBox(width: 10),
+                    Icon(Icons.check_circle_rounded, color: AppColors.brandGreen, size: 20),
+                    SizedBox(width: 10),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -246,7 +245,7 @@ class _ScreenGuardScreenState extends State<ScreenGuardScreen> {
                   ],
                 ),
               ),
-              const SizedBox(height: 14),
+              SizedBox(height: 14),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -254,13 +253,13 @@ class _ScreenGuardScreenState extends State<ScreenGuardScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.brandGreen,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    padding: EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14)),
                     elevation: 0,
                   ),
                   child: _isLoading
-                      ? const SizedBox(
+                      ? SizedBox(
                           height: 20,
                           width: 20,
                           child: CircularProgressIndicator(

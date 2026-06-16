@@ -1,0 +1,1 @@
+import 'package:mqtt_client/mqtt_client.dart'; import 'package:mqtt_client/mqtt_server_client.dart'; MqttClient setupMqttClient(String host, String identifier, int port) { final client = MqttServerClient.withPort('ws://$host', identifier, port); client.useWebSocket = true; return client; }

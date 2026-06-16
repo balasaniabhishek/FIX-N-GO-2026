@@ -79,18 +79,18 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.bg,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Stack(
         children: [
           Center(
             child: Container(
-              width: 400,
-              height: 400,
+              width: 500,
+              height: 500,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    AppColors.red.withValues(alpha: 0.12),
+                    AppColors.electricBlue.withValues(alpha: 0.15),
                     Colors.transparent,
                   ],
                 ),
@@ -105,47 +105,13 @@ class _SplashScreenState extends State<SplashScreen>
                   opacity: _opacityAnim.value,
                   child: Transform.scale(
                     scale: _scaleAnim.value,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Transform.scale(
-                          scale: _pulseAnim.value,
-                          child: Container(
-                            width: 100,
-                            height: 100,
-                            decoration: BoxDecoration(
-                              color: AppColors.red,
-                              shape: BoxShape.circle,
-                              boxShadow: AppShadows.red,
-                            ),
-                            child: const Icon(
-                              Icons.build_rounded,
-                              size: 48,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 24),
-                        const Text(
-                          'FIXER',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 36,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 6,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Technician Partner App',
-                          style: TextStyle(
-                            color: AppColors.grey,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            letterSpacing: 1,
-                          ),
-                        ),
-                      ],
+                    child: Transform.scale(
+                      scale: _pulseAnim.value,
+                      child: Image.asset(
+                        'assets/images/logo4.png',
+                        width: 200,
+                        fit: BoxFit.contain,
+                      ),
                     ),
                   ),
                 );
@@ -161,7 +127,7 @@ class _SplashScreenState extends State<SplashScreen>
               builder: (context, child) {
                 return Opacity(
                   opacity: _opacityAnim.value,
-                  child: const Column(
+                  child: Column(
                     children: [
                       Text(
                         'Powered by Fix-N-Go',

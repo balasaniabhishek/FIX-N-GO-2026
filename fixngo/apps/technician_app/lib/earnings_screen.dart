@@ -37,45 +37,45 @@ class _EarningsScreenState extends State<EarningsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.bg,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         leading: GestureDetector(
           onTap: () => Navigator.pop(context),
           child: Container(
-            margin: const EdgeInsets.all(8),
+            margin: EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: AppColors.card,
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.border),
+              border: Border.all(color: Theme.of(context).colorScheme.outline),
             ),
-            child: const Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: Colors.white),
+            child: Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: AppColors.textPrimary),
           ),
         ),
-        title: const Text('Earnings'),
+        title: Text('Earnings'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pushNamed(context, '/withdrawal'),
-            child: const Text('Withdraw', style: TextStyle(color: AppColors.green, fontWeight: FontWeight.w700)),
+            child: Text('Withdraw', style: TextStyle(color: AppColors.green, fontWeight: FontWeight.w700)),
           ),
         ],
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator(color: AppColors.red, strokeWidth: 2))
+          ? Center(child: CircularProgressIndicator(color: AppColors.amber, strokeWidth: 2))
           : RefreshIndicator(
-              color: AppColors.red,
-              backgroundColor: AppColors.card,
+              color: AppColors.amber,
+              backgroundColor: Theme.of(context).colorScheme.surface,
               onRefresh: _fetchStats,
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(20),
+                padding: EdgeInsets.all(20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildWalletCard(),
-                    const SizedBox(height: 20),
+                    SizedBox(height: 20),
                     _buildWeeklyChart(),
-                    const SizedBox(height: 20),
+                    SizedBox(height: 20),
                     _buildStatsGrid(),
-                    const SizedBox(height: 20),
+                    SizedBox(height: 20),
                     _buildTransactions(),
                   ],
                 ),
@@ -90,7 +90,7 @@ class _EarningsScreenState extends State<EarningsScreen> {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(24),
+      padding: EdgeInsets.all(24),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [Color(0xFF1A2A1A), Color(0xFF0F1F0F)],
@@ -106,12 +106,12 @@ class _EarningsScreenState extends State<EarningsScreen> {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
                   color: AppColors.green.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: const Text(
+                child: Text(
                   'WALLET BALANCE',
                   style: TextStyle(
                     color: AppColors.green,
@@ -122,35 +122,35 @@ class _EarningsScreenState extends State<EarningsScreen> {
                 ),
               ),
               const Spacer(),
-              const Icon(Icons.account_balance_wallet_rounded, color: AppColors.green, size: 24),
+              Icon(Icons.account_balance_wallet_rounded, color: AppColors.green, size: 24),
             ],
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
           Text(
             '₹$balance',
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: AppColors.textPrimary,
               fontSize: 44,
               fontWeight: FontWeight.w900,
               letterSpacing: -1,
             ),
           ),
-          const SizedBox(height: 4),
-          Text('Total earned: ₹$total', style: const TextStyle(color: AppColors.grey, fontSize: 14)),
-          const SizedBox(height: 20),
+          SizedBox(height: 4),
+          Text('Total earned: ₹$total', style: TextStyle(color: AppColors.grey, fontSize: 14)),
+          SizedBox(height: 20),
           GestureDetector(
             onTap: () => Navigator.pushNamed(context, '/withdrawal'),
             child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 12),
+              padding: EdgeInsets.symmetric(vertical: 12),
               decoration: BoxDecoration(
                 color: AppColors.green,
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: AppShadows.green,
               ),
-              child: const Center(
+              child: Center(
                 child: Text(
                   'Withdraw to Bank',
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 15),
+                  style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w700, fontSize: 15),
                 ),
               ),
             ),
@@ -168,12 +168,12 @@ class _EarningsScreenState extends State<EarningsScreen> {
         children: [
           Row(
             children: [
-              const Text('This Week', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w700)),
+              Text('This Week', style: TextStyle(color: AppColors.textPrimary, fontSize: 16, fontWeight: FontWeight.w700)),
               const Spacer(),
-              Text('₹${_weeklyData.reduce((a, b) => a + b).toInt()}', style: const TextStyle(color: AppColors.green, fontWeight: FontWeight.w700)),
+              Text('₹${_weeklyData.reduce((a, b) => a + b).toInt()}', style: TextStyle(color: AppColors.green, fontWeight: FontWeight.w700)),
             ],
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: 20),
           SizedBox(
             height: 120,
             child: Row(
@@ -185,14 +185,14 @@ class _EarningsScreenState extends State<EarningsScreen> {
                   child: GestureDetector(
                     onTap: () => setState(() => _selectedDay = i),
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 3),
+                      padding: EdgeInsets.symmetric(horizontal: 3),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           if (active)
                             Padding(
-                              padding: const EdgeInsets.only(bottom: 4),
-                              child: Text('₹${_weeklyData[i].toInt()}', style: const TextStyle(color: AppColors.green, fontSize: 9, fontWeight: FontWeight.w700)),
+                              padding: EdgeInsets.only(bottom: 4),
+                              child: Text('₹${_weeklyData[i].toInt()}', style: TextStyle(color: AppColors.green, fontSize: 9, fontWeight: FontWeight.w700)),
                             ),
                           AnimatedContainer(
                             duration: const Duration(milliseconds: 300),
@@ -202,11 +202,11 @@ class _EarningsScreenState extends State<EarningsScreen> {
                               borderRadius: BorderRadius.circular(6),
                             ),
                           ),
-                          const SizedBox(height: 6),
+                          SizedBox(height: 6),
                           Text(
                             _days[i],
                             style: TextStyle(
-                              color: active ? Colors.white : AppColors.grey,
+                              color: active ? AppColors.textPrimary : AppColors.grey,
                               fontSize: 10,
                               fontWeight: active ? FontWeight.w700 : FontWeight.w400,
                             ),
@@ -229,9 +229,9 @@ class _EarningsScreenState extends State<EarningsScreen> {
     return Row(
       children: [
         Expanded(child: _statCard('$jobs', 'Jobs Done', Icons.check_circle_rounded, AppColors.orange)),
-        const SizedBox(width: 10),
+        SizedBox(width: 10),
         Expanded(child: _statCard('4.8 ★', 'Avg Rating', Icons.star_rounded, AppColors.yellow)),
-        const SizedBox(width: 10),
+        SizedBox(width: 10),
         Expanded(child: _statCard('97%', 'Accept Rate', Icons.thumb_up_rounded, AppColors.green)),
       ],
     );
@@ -239,19 +239,19 @@ class _EarningsScreenState extends State<EarningsScreen> {
 
   Widget _statCard(String value, String label, IconData icon, Color color) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+      padding: EdgeInsets.symmetric(vertical: 16, horizontal: 12),
       decoration: BoxDecoration(
-        color: AppColors.card,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: Theme.of(context).colorScheme.outline),
       ),
       child: Column(
         children: [
           Icon(icon, color: color, size: 22),
-          const SizedBox(height: 6),
-          Text(value, style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w800)),
-          const SizedBox(height: 2),
-          Text(label, style: const TextStyle(color: AppColors.grey, fontSize: 10), textAlign: TextAlign.center),
+          SizedBox(height: 6),
+          Text(value, style: TextStyle(color: AppColors.textPrimary, fontSize: 15, fontWeight: FontWeight.w800)),
+          SizedBox(height: 2),
+          Text(label, style: TextStyle(color: AppColors.grey, fontSize: 10), textAlign: TextAlign.center),
         ],
       ),
     );
@@ -272,12 +272,12 @@ class _EarningsScreenState extends State<EarningsScreen> {
         ...txns.map((t) {
           final credit = t['type'] == 'credit';
           return Container(
-            margin: const EdgeInsets.only(bottom: 8),
-            padding: const EdgeInsets.all(14),
+            margin: EdgeInsets.only(bottom: 8),
+            padding: EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: AppColors.card,
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: AppColors.border),
+              border: Border.all(color: Theme.of(context).colorScheme.outline),
             ),
             child: Row(
               children: [
@@ -290,13 +290,13 @@ class _EarningsScreenState extends State<EarningsScreen> {
                   ),
                   child: Icon(credit ? Icons.arrow_downward_rounded : Icons.arrow_upward_rounded, color: credit ? AppColors.green : AppColors.red, size: 18),
                 ),
-                const SizedBox(width: 12),
+                SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(t['desc'] as String, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
-                      Text(t['date'] as String, style: const TextStyle(color: AppColors.grey, fontSize: 12)),
+                      Text(t['desc'] as String, style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
+                      Text(t['date'] as String, style: TextStyle(color: AppColors.grey, fontSize: 12)),
                     ],
                   ),
                 ),

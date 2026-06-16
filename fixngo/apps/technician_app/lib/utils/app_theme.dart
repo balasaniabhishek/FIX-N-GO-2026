@@ -25,8 +25,8 @@ class StatusBadge extends StatelessWidget {
         textColor = AppColors.orange;
         break;
       case 'accepted':
-        color = Colors.blue.withValues(alpha: 0.2);
-        textColor = Colors.blue;
+        color = AppColors.amber.withValues(alpha: 0.2);
+        textColor = AppColors.amber;
         break;
       case 'pending':
         color = AppColors.yellow.withValues(alpha: 0.2);
@@ -38,7 +38,7 @@ class StatusBadge extends StatelessWidget {
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
         color: color,
         borderRadius: BorderRadius.circular(20),
@@ -75,7 +75,7 @@ class GlassCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: padding ?? const EdgeInsets.all(16),
+        padding: padding ?? EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: AppColors.card,
           borderRadius: BorderRadius.circular(borderRadius ?? 16),
@@ -106,7 +106,8 @@ class PrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bg = color ?? AppColors.red;
+    final bg = color ?? AppColors.amber;
+    final fg = bg == AppColors.amber ? AppColors.navyDeep : Colors.white;
 
     return GestureDetector(
       onTap: isLoading ? null : onTap,
@@ -126,12 +127,12 @@ class PrimaryButton extends StatelessWidget {
           ],
         ),
         child: isLoading
-            ? const Center(
+            ? Center(
                 child: SizedBox(
                   width: 22,
                   height: 22,
                   child: CircularProgressIndicator(
-                    color: Colors.white,
+                    color: fg,
                     strokeWidth: 2.5,
                   ),
                 ),
@@ -140,13 +141,13 @@ class PrimaryButton extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   if (icon != null) ...[
-                    Icon(icon, size: 20, color: Colors.white),
-                    const SizedBox(width: 8),
+                    Icon(icon, size: 20, color: fg),
+                    SizedBox(width: 8),
                   ],
                   Text(
                     label,
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: fg,
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
                       letterSpacing: 0.3,
@@ -167,11 +168,10 @@ class SectionLabel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: EdgeInsets.only(bottom: 12),
       child: Text(
         text.toUpperCase(),
-        style: const TextStyle(
-          color: AppColors.grey,
+        style: TextStyle(color: AppColors.grey,
           fontSize: 11,
           fontWeight: FontWeight.w700,
           letterSpacing: 1.5,

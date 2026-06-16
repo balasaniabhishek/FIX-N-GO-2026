@@ -53,33 +53,32 @@ class HelpFaqScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.bgDark,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: AppColors.bgDark,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         leading: GestureDetector(
           onTap: () => Navigator.pop(context),
           child: Container(
-            margin: const EdgeInsets.all(8),
+            margin: EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: AppColors.bgCard,
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: AppColors.borderColor),
+              border: Border.all(color: Theme.of(context).colorScheme.outline),
             ),
-            child: const Icon(Icons.arrow_back_rounded,
-                color: AppColors.textPrimary, size: 20),
+            child: Icon(Icons.arrow_back_rounded, color: Theme.of(context).colorScheme.onSurface, size: 20),
           ),
         ),
         title: Text('Help & FAQ',
             style: GoogleFonts.poppins(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
-                color: AppColors.textWhite)),
+                color: AppColors.textPrimary)),
       ),
       body: ListView.separated(
         physics: const BouncingScrollPhysics(),
-        padding: const EdgeInsets.all(20),
+        padding: EdgeInsets.all(20),
         itemCount: _faqs.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 10),
+        separatorBuilder: (_, __) => SizedBox(height: 10),
         itemBuilder: (_, i) => _FaqTile(
           question: _faqs[i]['q']!,
           answer: _faqs[i]['a']!,
@@ -107,14 +106,14 @@ class _FaqTileState extends State<_FaqTile> {
       onTap: () => setState(() => _expanded = !_expanded),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: AppColors.bgCard,
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
             color: _expanded
                 ? AppColors.brandBlue.withValues(alpha: 0.3)
-                : AppColors.borderColor,
+                : Theme.of(context).colorScheme.outline,
           ),
         ),
         child: Column(
@@ -127,7 +126,7 @@ class _FaqTileState extends State<_FaqTile> {
                       style: GoogleFonts.poppins(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.textWhite)),
+                          color: AppColors.textPrimary)),
                 ),
                 Icon(
                   _expanded
@@ -138,9 +137,9 @@ class _FaqTileState extends State<_FaqTile> {
               ],
             ),
             if (_expanded) ...[
-              const SizedBox(height: 10),
-              Container(height: 1, color: AppColors.borderColor),
-              const SizedBox(height: 10),
+              SizedBox(height: 10),
+              Container(height: 1, color: Theme.of(context).colorScheme.outline),
+              SizedBox(height: 10),
               Text(widget.answer,
                   style: GoogleFonts.poppins(
                       fontSize: 13,

@@ -129,7 +129,7 @@ const loginUser = async (req, res, next) => {
     const emailNorm = normalizeEmail(email);
     const user = await User.findOne(emailSelector(emailNorm));
     if (!user) {
-      return res.status(401).json({ message: 'Invalid credentials' });
+      return res.status(404).json({ message: 'User Not Found' });
     }
 
     if (role && user.role !== role) {

@@ -68,13 +68,13 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.bgDark,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: RadialGradient(
             center: Alignment(0, -0.2),
             radius: 1.2,
-            colors: [Color(0xFF1A2A4A), AppColors.bgDark],
+            colors: [Color(0xFF1A2A4A), Theme.of(context).scaffoldBackgroundColor],
           ),
         ),
         child: Center(
@@ -93,12 +93,7 @@ class _SplashScreenState extends State<SplashScreen>
                         width: 100,
                         height: 100,
                         decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [AppColors.brandBlue, AppColors.accentCyan],
-                          ),
-                          borderRadius: BorderRadius.circular(28),
+                          borderRadius: BorderRadius.circular(50),
                           boxShadow: [
                             BoxShadow(
                               color: AppColors.brandBlue.withValues(alpha: 0.5),
@@ -107,13 +102,12 @@ class _SplashScreenState extends State<SplashScreen>
                             ),
                           ],
                         ),
-                        child: const Icon(
-                          Icons.build_rounded,
-                          size: 52,
-                          color: Colors.white,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(50),
+                          child: Image.asset('assets/images/logo.png', fit: BoxFit.contain),
                         ),
                       ),
-                      const SizedBox(height: 28),
+                      SizedBox(height: 28),
                       Transform.translate(
                         offset: Offset(0, _slideAnim.value),
                         child: Column(
@@ -123,11 +117,11 @@ class _SplashScreenState extends State<SplashScreen>
                               style: GoogleFonts.poppins(
                                 fontSize: 36,
                                 fontWeight: FontWeight.w800,
-                                color: AppColors.textWhite,
+                                color: AppColors.textPrimary,
                                 letterSpacing: -0.5,
                               ),
                             ),
-                            const SizedBox(height: 8),
+                            SizedBox(height: 8),
                             Text(
                               'Doorstep Mobile Repair · Under 60 min',
                               style: GoogleFonts.poppins(
@@ -139,7 +133,7 @@ class _SplashScreenState extends State<SplashScreen>
                           ],
                         ),
                       ),
-                      const SizedBox(height: 60),
+                      SizedBox(height: 60),
                       // Loading dots
                       Transform.translate(
                         offset: Offset(0, _slideAnim.value),
@@ -148,13 +142,13 @@ class _SplashScreenState extends State<SplashScreen>
                           children: List.generate(3, (i) {
                             return AnimatedContainer(
                               duration: Duration(milliseconds: 400 + i * 150),
-                              margin: const EdgeInsets.symmetric(horizontal: 4),
+                              margin: EdgeInsets.symmetric(horizontal: 4),
                               width: 8,
                               height: 8,
                               decoration: BoxDecoration(
                                 color: i == 0
                                     ? AppColors.brandBlue
-                                    : AppColors.borderColor,
+                                    : Theme.of(context).colorScheme.outline,
                                 shape: BoxShape.circle,
                               ),
                             );

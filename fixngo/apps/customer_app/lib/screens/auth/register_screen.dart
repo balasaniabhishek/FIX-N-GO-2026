@@ -63,19 +63,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.bgDark,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: RadialGradient(
             center: Alignment(0, -0.3),
             radius: 1.3,
-            colors: [Color(0xFF1E293B), AppColors.bgDark],
+            colors: [Color(0xFF1E293B), Theme.of(context).scaffoldBackgroundColor],
           ),
         ),
         child: SafeArea(
           child: Center(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              padding: EdgeInsets.symmetric(horizontal: 24.0),
               child: Form(
                 key: _formKey,
                 child: Column(
@@ -98,25 +98,25 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ),
                           ],
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.person_add_rounded,
                           size: 36,
                           color: Colors.white,
                         ),
                       ),
                     ),
-                    const SizedBox(height: 24),
+                    SizedBox(height: 24),
                     Text(
                       'Create Account',
                       textAlign: TextAlign.center,
                       style: GoogleFonts.poppins(
                         fontSize: 28,
                         fontWeight: FontWeight.w800,
-                        color: AppColors.textWhite,
+                        color: AppColors.textPrimary,
                         letterSpacing: -0.5,
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    SizedBox(height: 8),
                     Text(
                       'Sign up to get instant phone repairs',
                       textAlign: TextAlign.center,
@@ -125,25 +125,25 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         color: AppColors.textSecondary,
                       ),
                     ),
-                    const SizedBox(height: 36),
+                    SizedBox(height: 36),
 
                     // Name Field
                     TextFormField(
                       controller: _nameController,
-                      style: GoogleFonts.poppins(color: AppColors.textPrimary),
+                      style: GoogleFonts.poppins(color: Theme.of(context).colorScheme.onSurface),
                       decoration: InputDecoration(
                         labelText: 'Full Name',
                         labelStyle: GoogleFonts.poppins(color: AppColors.textSecondary),
-                        prefixIcon: const Icon(Icons.person_outline_rounded, color: AppColors.textSecondary),
+                        prefixIcon: Icon(Icons.person_outline_rounded, color: AppColors.textSecondary),
                         filled: true,
-                        fillColor: AppColors.bgCard,
+                        fillColor: Theme.of(context).colorScheme.surface,
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: AppColors.borderColor),
+                          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: AppColors.brandBlue),
+                          borderSide: BorderSide(color: AppColors.brandBlue),
                         ),
                       ),
                       validator: (value) {
@@ -153,25 +153,25 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         return null;
                       },
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: 16),
 
                     // Email Field
                     TextFormField(
                       controller: _emailController,
-                      style: GoogleFonts.poppins(color: AppColors.textPrimary),
+                      style: GoogleFonts.poppins(color: Theme.of(context).colorScheme.onSurface),
                       decoration: InputDecoration(
                         labelText: 'Email Address',
                         labelStyle: GoogleFonts.poppins(color: AppColors.textSecondary),
-                        prefixIcon: const Icon(Icons.email_outlined, color: AppColors.textSecondary),
+                        prefixIcon: Icon(Icons.email_outlined, color: AppColors.textSecondary),
                         filled: true,
-                        fillColor: AppColors.bgCard,
+                        fillColor: Theme.of(context).colorScheme.surface,
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: AppColors.borderColor),
+                          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: AppColors.brandBlue),
+                          borderSide: BorderSide(color: AppColors.brandBlue),
                         ),
                       ),
                       keyboardType: TextInputType.emailAddress,
@@ -182,17 +182,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         return null;
                       },
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: 16),
 
                     // Password Field
                     TextFormField(
                       controller: _passwordController,
-                      style: GoogleFonts.poppins(color: AppColors.textPrimary),
+                      style: GoogleFonts.poppins(color: Theme.of(context).colorScheme.onSurface),
                       obscureText: _obscurePassword,
                       decoration: InputDecoration(
                         labelText: 'Password',
                         labelStyle: GoogleFonts.poppins(color: AppColors.textSecondary),
-                        prefixIcon: const Icon(Icons.lock_outline_rounded, color: AppColors.textSecondary),
+                        prefixIcon: Icon(Icons.lock_outline_rounded, color: AppColors.textSecondary),
                         suffixIcon: IconButton(
                           icon: Icon(
                             _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
@@ -201,14 +201,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
                         ),
                         filled: true,
-                        fillColor: AppColors.bgCard,
+                        fillColor: Theme.of(context).colorScheme.surface,
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: AppColors.borderColor),
+                          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: AppColors.brandBlue),
+                          borderSide: BorderSide(color: AppColors.brandBlue),
                         ),
                       ),
                       validator: (value) {
@@ -218,26 +218,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         return null;
                       },
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: 16),
 
                     // Confirm Password Field
                     TextFormField(
                       controller: _confirmPasswordController,
-                      style: GoogleFonts.poppins(color: AppColors.textPrimary),
+                      style: GoogleFonts.poppins(color: Theme.of(context).colorScheme.onSurface),
                       obscureText: _obscurePassword,
                       decoration: InputDecoration(
                         labelText: 'Confirm Password',
                         labelStyle: GoogleFonts.poppins(color: AppColors.textSecondary),
-                        prefixIcon: const Icon(Icons.lock_clock_outlined, color: AppColors.textSecondary),
+                        prefixIcon: Icon(Icons.lock_clock_outlined, color: AppColors.textSecondary),
                         filled: true,
-                        fillColor: AppColors.bgCard,
+                        fillColor: Theme.of(context).colorScheme.surface,
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: AppColors.borderColor),
+                          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: AppColors.brandBlue),
+                          borderSide: BorderSide(color: AppColors.brandBlue),
                         ),
                       ),
                       validator: (value) {
@@ -247,14 +247,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         return null;
                       },
                     ),
-                    const SizedBox(height: 32),
+                    SizedBox(height: 32),
 
                     // Register Button
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.brandBlue,
                         foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        padding: EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -262,7 +262,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                       onPressed: _isLoading ? null : _submit,
                       child: _isLoading
-                          ? const SizedBox(
+                          ? SizedBox(
                               height: 20,
                               width: 20,
                               child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
@@ -275,7 +275,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               ),
                             ),
                     ),
-                    const SizedBox(height: 24),
+                    SizedBox(height: 24),
 
                     // Login Switcher
                     Row(

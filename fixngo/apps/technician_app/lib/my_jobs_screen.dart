@@ -32,10 +32,10 @@ class _MyJobsScreenState extends State<MyJobsScreen> {
   void _markCompleted(String id) async {
     bool success = await _apiService.updateOrderStatus(id, 'completed');
     if (success) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Job marked as completed!')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Job marked as completed!')));
       _fetchJobs();
     } else {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Failed to complete job.')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to complete job.')));
     }
   }
 
@@ -43,14 +43,14 @@ class _MyJobsScreenState extends State<MyJobsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Active Jobs'),
-        backgroundColor: AppColors.bg,
-        foregroundColor: AppColors.white,
+        title: Text('My Active Jobs'),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        foregroundColor: AppColors.textPrimary,
       ),
       body: _loading 
-        ? const Center(child: CircularProgressIndicator())
+        ? Center(child: CircularProgressIndicator())
         : _jobs.isEmpty 
-          ? const Center(
+          ? Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -66,30 +66,30 @@ class _MyJobsScreenState extends State<MyJobsScreen> {
                 final job = _jobs[index];
                 final isCompleted = job['status'] == 'completed';
                 return Card(
-                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   child: ListTile(
                     onTap: () => Navigator.pushNamed(
                       context,
                       '/job_detail',
                       arguments: job,
                     ),
-                    contentPadding: const EdgeInsets.all(16),
-                    title: Text(job['serviceType'] ?? 'General Repair', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                    contentPadding: EdgeInsets.all(16),
+                    title: Text(job['serviceType'] ?? 'General Repair', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const SizedBox(height: 8),
+                        SizedBox(height: 8),
                         Text('Address: ${job['location']?['address'] ?? 'N/A'}'),
                         Text('Est. Price: \$${job['estimatedPrice'] ?? '?'}'),
                         Text('Status: ${job['status']}'),
                       ]
                     ),
                     trailing: isCompleted 
-                        ? const Icon(Icons.check, color: AppColors.green, size: 32)
+                        ? Icon(Icons.check, color: AppColors.green, size: 32)
                         : ElevatedButton(
                           style: ElevatedButton.styleFrom(backgroundColor: AppColors.green, foregroundColor: AppColors.white),
                             onPressed: () => _markCompleted(job['_id']),
-                            child: const Text('COMPLETE'),
+                            child: Text('COMPLETE'),
                           ),
                   ),
                 );

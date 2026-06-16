@@ -5,10 +5,7 @@ allprojects {
     }
 }
 
-val newBuildDir: Directory =
-    rootProject.layout.buildDirectory
-        .dir("../../build")
-        .get()
+val newBuildDir: Directory = layout.projectDirectory.dir("../../build")
 rootProject.layout.buildDirectory.value(newBuildDir)
 
 subprojects {

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 import '../theme/app_theme.dart';
-import '../services/socket_service.dart';
+import '../services/mqtt_service.dart';
 import '../models/order_model.dart';
 import '../services/api_service.dart';
 import '../services/storage_service.dart';
@@ -17,7 +19,7 @@ class FindingTechScreen extends StatefulWidget {
 
 class _FindingTechScreenState extends State<FindingTechScreen>
     with TickerProviderStateMixin {
-  final SocketService _socketService = SocketService();
+  final MqttService _socketService = MqttService();
   final ApiService _apiService = ApiService();
   final StorageService _storageService = StorageService();
 
@@ -115,13 +117,13 @@ class _FindingTechScreenState extends State<FindingTechScreen>
     final dots = '.' * _dotCount;
 
     return Scaffold(
-      backgroundColor: AppColors.bgDark,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(20),
+          padding: EdgeInsets.all(20),
           child: Column(
             children: [
-              const SizedBox(height: 10),
+              SizedBox(height: 10),
               // Header
               Row(
                 children: [
@@ -130,7 +132,7 @@ class _FindingTechScreenState extends State<FindingTechScreen>
                     style: GoogleFonts.poppins(
                       fontSize: 22,
                       fontWeight: FontWeight.w800,
-                      color: AppColors.textWhite,
+                      color: AppColors.textPrimary,
                     ),
                   ),
                 ],
@@ -152,7 +154,7 @@ class _FindingTechScreenState extends State<FindingTechScreen>
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 20),
               // Map area
               Expanded(
                 child: Container(
@@ -160,39 +162,34 @@ class _FindingTechScreenState extends State<FindingTechScreen>
                   decoration: BoxDecoration(
                     color: const Color(0xFF0F1A2E),
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: AppColors.borderColor),
+                    border: Border.all(color: Theme.of(context).colorScheme.outline),
                   ),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(20),
                     child: Stack(
                       children: [
-                        // Map grid background
-                        CustomPaint(
-                          painter: _MapGridPainter(),
-                          size: Size.infinite,
-                        ),
+                        _buildFlutterMap(),
                         // Location label
                         Positioned(
                           top: 16,
                           left: 16,
                           child: Container(
-                            padding: const EdgeInsets.symmetric(
+                            padding: EdgeInsets.symmetric(
                                 horizontal: 12, vertical: 6),
                             decoration: BoxDecoration(
-                              color: AppColors.bgCard.withValues(alpha: 0.9),
+                              color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.9),
                               borderRadius: BorderRadius.circular(20),
-                              border: Border.all(color: AppColors.borderColor),
+                              border: Border.all(color: Theme.of(context).colorScheme.outline),
                             ),
                             child: Row(
                               children: [
-                                const Icon(Icons.location_on_rounded,
-                                    color: AppColors.brandBlue, size: 14),
-                                const SizedBox(width: 6),
+                                Icon(Icons.location_on_rounded, color: AppColors.brandBlue, size: 14),
+                                SizedBox(width: 6),
                                 Text(
-                                  'Kondapur, Hyderabad',
+                                  _order?.serviceAddress ?? 'Locating...',
                                   style: GoogleFonts.poppins(
                                     fontSize: 12,
-                                    color: AppColors.textPrimary,
+                                    color: Theme.of(context).colorScheme.onSurface,
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),
@@ -200,100 +197,12 @@ class _FindingTechScreenState extends State<FindingTechScreen>
                             ),
                           ),
                         ),
-                        // Center user marker with ripple
-                        Center(
-                          child: AnimatedBuilder(
-                            animation: _rippleAnim,
-                            builder: (context, child) {
-                              return Stack(
-                                alignment: Alignment.center,
-                                children: [
-                                  // Outer ripple
-                                  Opacity(
-                                    opacity: (1 - _rippleAnim.value) * 0.4,
-                                    child: Container(
-                                      width: 120 * _rippleAnim.value,
-                                      height: 120 * _rippleAnim.value,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        border: Border.all(
-                                          color: AppColors.brandBlue,
-                                          width: 1.5,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  // Inner ripple
-                                  Opacity(
-                                    opacity:
-                                        (1 - _rippleAnim.value).clamp(0, 1) * 0.6,
-                                    child: Container(
-                                      width: 70 * _rippleAnim.value,
-                                      height: 70 * _rippleAnim.value,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: AppColors.brandBlue.withValues(alpha: 0.1),
-                                      ),
-                                    ),
-                                  ),
-                                  // User dot
-                                  AnimatedBuilder(
-                                    animation: _pulseAnim,
-                                    builder: (_, __) => Transform.scale(
-                                      scale: _pulseAnim.value,
-                                      child: Container(
-                                        width: 24,
-                                        height: 24,
-                                        decoration: BoxDecoration(
-                                          color: AppColors.accentCyan,
-                                          shape: BoxShape.circle,
-                                          border: Border.all(
-                                              color: Colors.white, width: 3),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: AppColors.accentCyan
-                                                  .withValues(alpha: 0.6),
-                                              blurRadius: 12,
-                                              spreadRadius: 2,
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              );
-                            },
-                          ),
-                        ),
-                        // Technician markers
-                        _TechMarker(
-                          top: 80,
-                          left: 60,
-                          name: 'R',
-                          isActive: _techFound,
-                          delay: 0,
-                        ),
-                        _TechMarker(
-                          top: 70,
-                          right: 70,
-                          name: 'A',
-                          isActive: false,
-                          delay: 500,
-                        ),
-                        _TechMarker(
-                          bottom: 120,
-                          left: 80,
-                          name: 'K',
-                          isActive: false,
-                          delay: 1000,
-                        ),
                       ],
                     ),
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
               // Tech card
               AnimatedSwitcher(
                 duration: const Duration(milliseconds: 400),
@@ -315,6 +224,122 @@ class _FindingTechScreenState extends State<FindingTechScreen>
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildFlutterMap() {
+    final customerLat = _order?.serviceLat ?? 17.4065;
+    final customerLng = _order?.serviceLng ?? 78.4772;
+
+    return FlutterMap(
+      options: MapOptions(
+        initialCenter: LatLng(customerLat, customerLng),
+        initialZoom: 14.5,
+      ),
+      children: [
+        TileLayer(
+          urlTemplate: const String.fromEnvironment('TILESERVER_URL', defaultValue: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png'),
+          userAgentPackageName: 'com.fixngo.customerapp',
+        ),
+        MarkerLayer(
+          markers: [
+            // Center user marker with ripple
+            Marker(
+              point: LatLng(customerLat, customerLng),
+              width: 150,
+              height: 150,
+              child: AnimatedBuilder(
+                animation: _rippleAnim,
+                builder: (context, child) {
+                  return Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      // Outer ripple
+                      Opacity(
+                        opacity: (1 - _rippleAnim.value) * 0.4,
+                        child: Container(
+                          width: 120 * _rippleAnim.value,
+                          height: 120 * _rippleAnim.value,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: AppColors.brandBlue,
+                              width: 1.5,
+                            ),
+                          ),
+                        ),
+                      ),
+                      // Inner ripple
+                      Opacity(
+                        opacity: (1 - _rippleAnim.value).clamp(0.0, 1.0) * 0.6,
+                        child: Container(
+                          width: 70 * _rippleAnim.value,
+                          height: 70 * _rippleAnim.value,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: AppColors.brandBlue.withValues(alpha: 0.1),
+                          ),
+                        ),
+                      ),
+                      // User dot
+                      AnimatedBuilder(
+                        animation: _pulseAnim,
+                        builder: (_, __) => Transform.scale(
+                          scale: _pulseAnim.value,
+                          child: Container(
+                            width: 24,
+                            height: 24,
+                            decoration: BoxDecoration(
+                              color: AppColors.accentCyan,
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.white, width: 3),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.accentCyan.withValues(alpha: 0.6),
+                                  blurRadius: 12,
+                                  spreadRadius: 2,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
+            // Mock nearby technicians
+            if (!_techFound) ...[
+              Marker(
+                point: LatLng(customerLat + 0.005, customerLng + 0.005),
+                width: 44,
+                height: 44,
+                child: const _TechMarker(name: 'R', isActive: false, delay: 0),
+              ),
+              Marker(
+                point: LatLng(customerLat - 0.003, customerLng + 0.008),
+                width: 44,
+                height: 44,
+                child: const _TechMarker(name: 'A', isActive: false, delay: 500),
+              ),
+              Marker(
+                point: LatLng(customerLat - 0.006, customerLng - 0.004),
+                width: 44,
+                height: 44,
+                child: const _TechMarker(name: 'K', isActive: false, delay: 1000),
+              ),
+            ],
+            if (_techFound && _order?.technicianLat != null && _order?.technicianLng != null)
+              Marker(
+                point: LatLng(_order!.technicianLat!, _order!.technicianLng!),
+                width: 44,
+                height: 44,
+                child: const _TechMarker(name: 'T', isActive: true, delay: 0),
+              ),
+          ],
+        ),
+      ],
     );
   }
 }
@@ -352,10 +377,10 @@ class _TechMarker extends StatelessWidget {
         decoration: BoxDecoration(
           color: isActive
               ? AppColors.brandBlue.withValues(alpha: 0.9)
-              : AppColors.bgCardLight.withValues(alpha: 0.85),
+              : Theme.of(context).colorScheme.surface.withValues(alpha: 0.85),
           shape: BoxShape.circle,
           border: Border.all(
-            color: isActive ? AppColors.brandBlue : AppColors.borderColor,
+            color: isActive ? AppColors.brandBlue : Theme.of(context).colorScheme.outline,
             width: 2,
           ),
           boxShadow: isActive
@@ -381,11 +406,11 @@ class _SearchingCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(18),
+      padding: EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: AppColors.bgCard,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.borderColor),
+        border: Border.all(color: Theme.of(context).colorScheme.outline),
       ),
       child: Row(
         children: [
@@ -398,7 +423,7 @@ class _SearchingCard extends StatelessWidget {
               border: Border.all(
                   color: AppColors.brandBlue.withValues(alpha: 0.3), width: 2),
             ),
-            child: const Center(
+            child: Center(
               child: SizedBox(
                 width: 24,
                 height: 24,
@@ -409,7 +434,7 @@ class _SearchingCard extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(width: 16),
+          SizedBox(width: 16),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -417,7 +442,7 @@ class _SearchingCard extends StatelessWidget {
                   style: GoogleFonts.poppins(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
-                    color: AppColors.textWhite,
+                    color: AppColors.textPrimary,
                   )),
               Text('Searching in your area...',
                   style: GoogleFonts.poppins(
@@ -448,11 +473,11 @@ class _TechFoundCard extends StatelessWidget {
     return Column(
       children: [
         Container(
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: AppColors.bgCard,
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppColors.borderColor),
+            border: Border.all(color: Theme.of(context).colorScheme.outline),
           ),
           child: Row(
             children: [
@@ -465,10 +490,10 @@ class _TechFoundCard extends StatelessWidget {
                   ),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.person_rounded,
+                child: Icon(Icons.person_rounded,
                     color: Colors.white, size: 26),
               ),
-              const SizedBox(width: 14),
+              SizedBox(width: 14),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -477,23 +502,21 @@ class _TechFoundCard extends StatelessWidget {
                         style: GoogleFonts.poppins(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
-                          color: AppColors.textWhite,
+                          color: AppColors.textPrimary,
                         )),
                     Row(
                       children: [
-                        const Icon(Icons.star_rounded,
-                            color: AppColors.starYellow, size: 14),
-                        const SizedBox(width: 4),
+                        Icon(Icons.star_rounded, color: AppColors.starYellow, size: 14),
+                        SizedBox(width: 4),
                         Text(rating.toString(),
                             style: GoogleFonts.poppins(
                               fontSize: 12,
                               color: AppColors.textSecondary,
                               fontWeight: FontWeight.w600,
                             )),
-                        const SizedBox(width: 8),
-                        const Icon(Icons.directions_walk_rounded,
-                            color: AppColors.textMuted, size: 14),
-                        const SizedBox(width: 2),
+                        SizedBox(width: 8),
+                        Icon(Icons.directions_walk_rounded, color: AppColors.textMuted, size: 14),
+                        SizedBox(width: 2),
                         Text('Nearby',
                             style: GoogleFonts.poppins(
                               fontSize: 12,
@@ -506,7 +529,7 @@ class _TechFoundCard extends StatelessWidget {
               ),
               Container(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color: AppColors.brandGreen.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(10),
@@ -532,7 +555,7 @@ class _TechFoundCard extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(height: 12),
+        SizedBox(height: 12),
         SizedBox(
           width: double.infinity,
           child: ElevatedButton(
@@ -540,7 +563,7 @@ class _TechFoundCard extends StatelessWidget {
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.brandBlue,
               foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 16),
+              padding: EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14)),
               elevation: 0,
@@ -551,8 +574,8 @@ class _TechFoundCard extends StatelessWidget {
                 Text('Track Technician',
                     style: GoogleFonts.poppins(
                         fontSize: 16, fontWeight: FontWeight.w700)),
-                const SizedBox(width: 8),
-                const Icon(Icons.arrow_forward_rounded, size: 20),
+                SizedBox(width: 8),
+                Icon(Icons.arrow_forward_rounded, size: 20),
               ],
             ),
           ),
@@ -562,44 +585,3 @@ class _TechFoundCard extends StatelessWidget {
   }
 }
 
-class _MapGridPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = const Color(0xFF1A2A40).withValues(alpha: 0.8)
-      ..strokeWidth = 1;
-
-    const step = 40.0;
-    for (double x = 0; x < size.width; x += step) {
-      canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
-    }
-    for (double y = 0; y < size.height; y += step) {
-      canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
-    }
-
-    // Draw some "road" lines
-    final roadPaint = Paint()
-      ..color = const Color(0xFF1E3A5A).withValues(alpha: 0.9)
-      ..strokeWidth = 12
-      ..strokeCap = StrokeCap.round;
-
-    canvas.drawLine(
-      Offset(0, size.height * 0.4),
-      Offset(size.width, size.height * 0.4),
-      roadPaint,
-    );
-    canvas.drawLine(
-      Offset(size.width * 0.35, 0),
-      Offset(size.width * 0.35, size.height),
-      roadPaint,
-    );
-    canvas.drawLine(
-      Offset(size.width * 0.7, 0),
-      Offset(size.width * 0.7, size.height),
-      roadPaint,
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}

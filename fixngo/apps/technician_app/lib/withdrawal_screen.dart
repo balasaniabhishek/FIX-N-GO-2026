@@ -27,7 +27,7 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
     final amount = int.tryParse(_amountCtrl.text.trim()) ?? 0;
     if (amount <= 0 || _bankCtrl.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Enter a valid amount and bank account'), backgroundColor: AppColors.red),
+        SnackBar(content: Text('Enter a valid amount and bank account'), backgroundColor: AppColors.red),
       );
       return;
     }
@@ -39,12 +39,12 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
 
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Withdrawal requested successfully!'), backgroundColor: AppColors.green),
+        SnackBar(content: Text('Withdrawal requested successfully!'), backgroundColor: AppColors.green),
       );
       Navigator.pop(context);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Withdrawal request failed'), backgroundColor: AppColors.red),
+        SnackBar(content: Text('Withdrawal request failed'), backgroundColor: AppColors.red),
       );
     }
   }
@@ -52,15 +52,15 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.bg,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text('Withdraw Funds'),
-        backgroundColor: AppColors.bg,
-        foregroundColor: AppColors.white,
+        title: Text('Withdraw Funds'),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        foregroundColor: AppColors.textPrimary,
       ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(20),
+          padding: EdgeInsets.all(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -68,17 +68,17 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
               TextField(
                 controller: _amountCtrl,
                 keyboardType: TextInputType.number,
-                style: const TextStyle(color: Colors.white),
+                style: TextStyle(color: AppColors.textPrimary),
                 decoration: const InputDecoration(
                   hintText: 'Enter amount',
                   prefixIcon: Icon(Icons.currency_rupee_rounded),
                 ),
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
               const SectionLabel('Bank Account'),
               TextField(
                 controller: _bankCtrl,
-                style: const TextStyle(color: Colors.white),
+                style: TextStyle(color: AppColors.textPrimary),
                 decoration: const InputDecoration(
                   hintText: 'Bank account number',
                   prefixIcon: Icon(Icons.account_balance_rounded),

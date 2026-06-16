@@ -9,7 +9,7 @@ class ApiConfig {
   static String get baseUrl {
     if (_overrideBaseUrl.isNotEmpty) return _overrideBaseUrl;
     if (kIsWeb) return 'http://localhost:5000';
-    if (defaultTargetPlatform == TargetPlatform.android) return 'http://10.0.2.2:5000';
+    if (defaultTargetPlatform == TargetPlatform.android) return 'https://adjustments-glasses-gender-problems.trycloudflare.com';
     return 'http://localhost:5000';
   }
 

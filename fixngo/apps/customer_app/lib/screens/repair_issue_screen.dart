@@ -81,42 +81,42 @@ class _RepairIssueScreenState extends State<RepairIssueScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.bgDark,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: AppColors.bgDark,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         leading: GestureDetector(
           onTap: () => Navigator.pop(context),
           child: Container(
-            margin: const EdgeInsets.all(8),
+            margin: EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: AppColors.bgCard,
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: AppColors.borderColor),
+              border: Border.all(color: Theme.of(context).colorScheme.outline),
             ),
-            child: const Icon(Icons.arrow_back_ios_new_rounded,
-                size: 16, color: AppColors.textPrimary),
+            child: Icon(Icons.arrow_back_ios_new_rounded,
+                size: 16, color: Theme.of(context).colorScheme.onSurface),
           ),
         ),
         title: Text(
           "What's the issue?",
           style: GoogleFonts.poppins(
-              fontSize: 20, fontWeight: FontWeight.w700, color: AppColors.textWhite),
+              fontSize: 20, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
         ),
       ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(20),
+          padding: EdgeInsets.all(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: AppColors.bgCard,
+                      color: Theme.of(context).colorScheme.surface,
                       borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: AppColors.borderColor),
+                      border: Border.all(color: Theme.of(context).colorScheme.outline),
                     ),
                     child: Text(
                       widget.device,
@@ -127,7 +127,7 @@ class _RepairIssueScreenState extends State<RepairIssueScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 10),
+                  SizedBox(width: 10),
                   Text(
                     'Select all that apply',
                     style: GoogleFonts.poppins(
@@ -137,12 +137,12 @@ class _RepairIssueScreenState extends State<RepairIssueScreen> {
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
               Expanded(
                 child: ListView.separated(
                   physics: const BouncingScrollPhysics(),
                   itemCount: issues.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 10),
+                  separatorBuilder: (_, __) => SizedBox(height: 10),
                   itemBuilder: (context, i) {
                     final issue = issues[i];
                     final isSelected = selectedIssues.contains(issue['name']);
@@ -160,16 +160,16 @@ class _RepairIssueScreenState extends State<RepairIssueScreen> {
                       },
                       child: AnimatedContainer(
                         duration: const Duration(milliseconds: 200),
-                        padding: const EdgeInsets.all(16),
+                        padding: EdgeInsets.all(16),
                         decoration: BoxDecoration(
                           color: isSelected
                               ? AppColors.brandBlue.withValues(alpha: 0.12)
-                              : AppColors.bgCard,
+                              : Theme.of(context).colorScheme.surface,
                           borderRadius: BorderRadius.circular(14),
                           border: Border.all(
                             color: isSelected
                                 ? AppColors.brandBlue
-                                : AppColors.borderColor,
+                                : Theme.of(context).colorScheme.outline,
                             width: isSelected ? 1.5 : 1,
                           ),
                         ),
@@ -185,7 +185,7 @@ class _RepairIssueScreenState extends State<RepairIssueScreen> {
                               child: Icon(issue['icon'] as IconData,
                                   color: issue['color'] as Color, size: 22),
                             ),
-                            const SizedBox(width: 14),
+                            SizedBox(width: 14),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -196,8 +196,8 @@ class _RepairIssueScreenState extends State<RepairIssueScreen> {
                                       fontSize: 15,
                                       fontWeight: FontWeight.w600,
                                       color: isSelected
-                                          ? AppColors.textWhite
-                                          : AppColors.textPrimary,
+                                          ? Colors.white
+                                          : Theme.of(context).colorScheme.onSurface,
                                     ),
                                   ),
                                   Text(
@@ -222,12 +222,12 @@ class _RepairIssueScreenState extends State<RepairIssueScreen> {
                                 border: Border.all(
                                   color: isSelected
                                       ? AppColors.brandBlue
-                                      : AppColors.borderColor,
+                                      : Theme.of(context).colorScheme.outline,
                                   width: 2,
                                 ),
                               ),
                               child: isSelected
-                                  ? const Icon(Icons.check_rounded,
+                                  ? Icon(Icons.check_rounded,
                                       size: 14, color: Colors.white)
                                   : null,
                             ),
@@ -238,7 +238,7 @@ class _RepairIssueScreenState extends State<RepairIssueScreen> {
                   },
                 ),
               ),
-              const SizedBox(height: 14),
+              SizedBox(height: 14),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -246,13 +246,13 @@ class _RepairIssueScreenState extends State<RepairIssueScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.brandBlue,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    padding: EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14)),
                     elevation: 0,
                   ),
                   child: _isLoading
-                      ? const SizedBox(
+                      ? SizedBox(
                           height: 20,
                           width: 20,
                           child: CircularProgressIndicator(

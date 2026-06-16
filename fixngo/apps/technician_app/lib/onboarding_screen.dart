@@ -14,7 +14,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _controller = PageController();
   int _page = 0;
 
-  final List<Map<String, dynamic>> _slides = const [
+  final List<Map<String, dynamic>> _slides = [
     {
       'icon': Icons.work_history_rounded,
       'title': 'Get job requests instantly',
@@ -48,20 +48,20 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.bg,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(20),
+          padding: EdgeInsets.all(20),
           child: Column(
             children: [
               Align(
                 alignment: Alignment.centerRight,
                 child: TextButton(
                   onPressed: _finish,
-                  child: const Text('Skip'),
+                  child: Text('Skip'),
                 ),
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
               Expanded(
                 child: PageView.builder(
                   controller: _controller,
@@ -76,30 +76,29 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           width: 120,
                           height: 120,
                           decoration: BoxDecoration(
-                            color: AppColors.card,
+                            color: Theme.of(context).colorScheme.surface,
                             shape: BoxShape.circle,
-                            border: Border.all(color: AppColors.border),
-                            boxShadow: AppShadows.red,
+                            border: Border.all(color: Theme.of(context).colorScheme.outline),
+                            boxShadow: AppShadows.amber,
                           ),
-                          child: Icon(slide['icon'] as IconData, size: 54, color: AppColors.red),
+                          child: Icon(slide['icon'] as IconData, size: 54, color: AppColors.amber),
                         ),
-                        const SizedBox(height: 28),
+                        SizedBox(height: 28),
                         Text(
                           slide['title'] as String,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            color: Colors.white,
+                          style: TextStyle(
+                            color: AppColors.textPrimary,
                             fontSize: 26,
                             fontWeight: FontWeight.w800,
                             height: 1.2,
                           ),
                         ),
-                        const SizedBox(height: 14),
+                        SizedBox(height: 14),
                         Text(
                           slide['subtitle'] as String,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            color: AppColors.grey,
+                          style: TextStyle(color: AppColors.grey,
                             fontSize: 14,
                             height: 1.6,
                           ),
@@ -115,24 +114,24 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   _slides.length,
                   (index) => AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
-                    margin: const EdgeInsets.symmetric(horizontal: 4),
+                    margin: EdgeInsets.symmetric(horizontal: 4),
                     width: _page == index ? 22 : 8,
                     height: 8,
                     decoration: BoxDecoration(
-                      color: _page == index ? AppColors.red : AppColors.border,
+                      color: _page == index ? AppColors.amber : Theme.of(context).colorScheme.outline,
                       borderRadius: BorderRadius.circular(100),
                     ),
                   ),
                 ),
               ),
-              const SizedBox(height: 24),
+              SizedBox(height: 24),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.red,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    backgroundColor: AppColors.amber,
+                    foregroundColor: AppColors.navyDeep,
+                    padding: EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   ),
                   onPressed: () {
@@ -148,7 +147,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   child: Text(_page == _slides.length - 1 ? 'Get Started' : 'Continue'),
                 ),
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
             ],
           ),
         ),

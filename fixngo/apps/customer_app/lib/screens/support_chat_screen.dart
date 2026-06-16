@@ -51,7 +51,7 @@ class _SupportChatScreenState extends State<SupportChatScreen> {
   Future<void> _submit() async {
     if (_subjectCtrl.text.trim().isEmpty || _messageCtrl.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill in subject and message')),
+        SnackBar(content: Text('Please fill in subject and message')),
       );
       return;
     }
@@ -68,7 +68,7 @@ class _SupportChatScreenState extends State<SupportChatScreen> {
       await _loadTickets();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Ticket submitted successfully')),
+          SnackBar(content: Text('Ticket submitted successfully')),
         );
       }
     } catch (e) {
@@ -97,41 +97,40 @@ class _SupportChatScreenState extends State<SupportChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.bgDark,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: AppColors.bgDark,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         leading: GestureDetector(
           onTap: () => Navigator.pop(context),
           child: Container(
-            margin: const EdgeInsets.all(8),
+            margin: EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: AppColors.bgCard,
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: AppColors.borderColor),
+              border: Border.all(color: Theme.of(context).colorScheme.outline),
             ),
-            child: const Icon(Icons.arrow_back_rounded,
-                color: AppColors.textPrimary, size: 20),
+            child: Icon(Icons.arrow_back_rounded, color: Theme.of(context).colorScheme.onSurface, size: 20),
           ),
         ),
         title: Text('Support',
             style: GoogleFonts.poppins(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
-                color: AppColors.textWhite)),
+                color: AppColors.textPrimary)),
       ),
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
-        padding: const EdgeInsets.all(20),
+        padding: EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // New ticket form
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AppColors.bgCard,
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: AppColors.borderColor),
+                border: Border.all(color: Theme.of(context).colorScheme.outline),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -140,28 +139,28 @@ class _SupportChatScreenState extends State<SupportChatScreen> {
                       style: GoogleFonts.poppins(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
-                          color: AppColors.textWhite)),
-                  const SizedBox(height: 12),
+                          color: AppColors.textPrimary)),
+                  SizedBox(height: 12),
                   TextField(
                     controller: _subjectCtrl,
                     decoration: InputDecoration(
                       hintText: 'Subject',
                       hintStyle: GoogleFonts.poppins(color: AppColors.textMuted),
                       filled: true,
-                      fillColor: AppColors.bgDark,
+                      fillColor: Theme.of(context).scaffoldBackgroundColor,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
-                        borderSide: const BorderSide(color: AppColors.borderColor),
+                        borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
-                        borderSide: const BorderSide(color: AppColors.borderColor),
+                        borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
                       ),
                     ),
                     style: GoogleFonts.poppins(
-                        color: AppColors.textPrimary, fontSize: 14),
+                        color: Theme.of(context).colorScheme.onSurface, fontSize: 14),
                   ),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10),
                   TextField(
                     controller: _messageCtrl,
                     maxLines: 4,
@@ -169,20 +168,20 @@ class _SupportChatScreenState extends State<SupportChatScreen> {
                       hintText: 'Describe your issue...',
                       hintStyle: GoogleFonts.poppins(color: AppColors.textMuted),
                       filled: true,
-                      fillColor: AppColors.bgDark,
+                      fillColor: Theme.of(context).scaffoldBackgroundColor,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
-                        borderSide: const BorderSide(color: AppColors.borderColor),
+                        borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
-                        borderSide: const BorderSide(color: AppColors.borderColor),
+                        borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
                       ),
                     ),
                     style: GoogleFonts.poppins(
-                        color: AppColors.textPrimary, fontSize: 14),
+                        color: Theme.of(context).colorScheme.onSurface, fontSize: 14),
                   ),
-                  const SizedBox(height: 14),
+                  SizedBox(height: 14),
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
@@ -190,13 +189,13 @@ class _SupportChatScreenState extends State<SupportChatScreen> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.brandBlue,
                         foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        padding: EdgeInsets.symmetric(vertical: 12),
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10)),
                         elevation: 0,
                       ),
                       child: _submitting
-                          ? const SizedBox(
+                          ? SizedBox(
                               width: 20,
                               height: 20,
                               child: CircularProgressIndicator(
@@ -209,22 +208,22 @@ class _SupportChatScreenState extends State<SupportChatScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: 24),
 
             // Existing tickets
             Text('Your Tickets',
                 style: GoogleFonts.poppins(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
-                    color: AppColors.textWhite)),
-            const SizedBox(height: 12),
+                    color: AppColors.textPrimary)),
+            SizedBox(height: 12),
             if (_loading)
-              const Center(
+              Center(
                   child: CircularProgressIndicator(color: AppColors.brandBlue))
             else if (_tickets.isEmpty)
               Center(
                 child: Padding(
-                  padding: const EdgeInsets.only(top: 30),
+                  padding: EdgeInsets.only(top: 30),
                   child: Text('No tickets yet',
                       style: GoogleFonts.poppins(
                           fontSize: 14, color: AppColors.textMuted)),
@@ -235,12 +234,12 @@ class _SupportChatScreenState extends State<SupportChatScreen> {
                 final t = _tickets[i] as Map<String, dynamic>;
                 final status = (t['status'] as String?) ?? 'open';
                 return Container(
-                  margin: const EdgeInsets.only(bottom: 10),
-                  padding: const EdgeInsets.all(14),
+                  margin: EdgeInsets.only(bottom: 10),
+                  padding: EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                    color: AppColors.bgCard,
+                    color: Theme.of(context).colorScheme.surface,
                     borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: AppColors.borderColor),
+                    border: Border.all(color: Theme.of(context).colorScheme.outline),
                   ),
                   child: Row(
                     children: [
@@ -254,7 +253,7 @@ class _SupportChatScreenState extends State<SupportChatScreen> {
                         child: Icon(Icons.support_agent_rounded,
                             color: _statusColor(status), size: 20),
                       ),
-                      const SizedBox(width: 12),
+                      SizedBox(width: 12),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -264,7 +263,7 @@ class _SupportChatScreenState extends State<SupportChatScreen> {
                               style: GoogleFonts.poppins(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w600,
-                                  color: AppColors.textWhite),
+                                  color: AppColors.textPrimary),
                             ),
                             Text(
                               status.replaceAll('_', ' ').toUpperCase(),

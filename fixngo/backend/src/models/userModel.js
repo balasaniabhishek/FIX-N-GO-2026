@@ -45,6 +45,11 @@ const userSchema = mongoose.Schema(
         panCard: { type: String, default: '' },
         license: { type: String, default: '' },
       },
+      bankDetails: {
+        accountName: { type: String, default: '' },
+        accountNumber: { type: String, default: '' },
+        ifscCode: { type: String, default: '' },
+      },
       verification: {
         status: { type: String, enum: ['unverified', 'pending', 'verified', 'rejected'], default: 'unverified' },
         aadhaarVerified: { type: Boolean, default: false },

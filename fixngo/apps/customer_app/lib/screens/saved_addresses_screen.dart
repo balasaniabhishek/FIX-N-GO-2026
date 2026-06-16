@@ -38,20 +38,20 @@ class _SavedAddressesScreenState extends State<SavedAddressesScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: AppColors.bgCard,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         title: Text('Add Address',
             style: GoogleFonts.poppins(
-                color: AppColors.textWhite, fontWeight: FontWeight.bold)),
+                color: AppColors.textPrimary, fontWeight: FontWeight.bold)),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               _field(labelCtrl, 'Label (e.g. Home, Office)'),
-              const SizedBox(height: 8),
+              SizedBox(height: 8),
               _field(addrCtrl, 'Address'),
-              const SizedBox(height: 8),
+              SizedBox(height: 8),
               _field(cityCtrl, 'City'),
-              const SizedBox(height: 8),
+              SizedBox(height: 8),
               _field(pinCtrl, 'Pincode'),
             ],
           ),
@@ -59,7 +59,7 @@ class _SavedAddressesScreenState extends State<SavedAddressesScreen> {
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(ctx),
-              child: const Text('Cancel')),
+              child: Text('Cancel')),
           ElevatedButton(
             onPressed: () {
               if (addrCtrl.text.trim().isNotEmpty) {
@@ -76,7 +76,7 @@ class _SavedAddressesScreenState extends State<SavedAddressesScreen> {
               }
               Navigator.pop(ctx);
             },
-            child: const Text('Save'),
+            child: Text('Save'),
           ),
         ],
       ),
@@ -87,39 +87,38 @@ class _SavedAddressesScreenState extends State<SavedAddressesScreen> {
     return TextField(
       controller: ctrl,
       decoration: InputDecoration(labelText: label),
-      style: const TextStyle(color: AppColors.textPrimary),
+      style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.bgDark,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: AppColors.bgDark,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         leading: GestureDetector(
           onTap: () => Navigator.pop(context),
           child: Container(
-            margin: const EdgeInsets.all(8),
+            margin: EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: AppColors.bgCard,
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: AppColors.borderColor),
+              border: Border.all(color: Theme.of(context).colorScheme.outline),
             ),
-            child: const Icon(Icons.arrow_back_rounded,
-                color: AppColors.textPrimary, size: 20),
+            child: Icon(Icons.arrow_back_rounded, color: Theme.of(context).colorScheme.onSurface, size: 20),
           ),
         ),
         title: Text('Saved Addresses',
             style: GoogleFonts.poppins(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
-                color: AppColors.textWhite)),
+                color: AppColors.textPrimary)),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _showAddDialog,
         backgroundColor: AppColors.brandBlue,
-        child: const Icon(Icons.add, color: Colors.white),
+        child: Icon(Icons.add, color: Colors.white),
       ),
       body: _addresses.isEmpty
           ? Center(
@@ -130,20 +129,20 @@ class _SavedAddressesScreenState extends State<SavedAddressesScreen> {
                     width: 80,
                     height: 80,
                     decoration: BoxDecoration(
-                      color: AppColors.bgCard,
+                      color: Theme.of(context).colorScheme.surface,
                       shape: BoxShape.circle,
-                      border: Border.all(color: AppColors.borderColor),
+                      border: Border.all(color: Theme.of(context).colorScheme.outline),
                     ),
-                    child: const Icon(Icons.location_off_rounded,
+                    child: Icon(Icons.location_off_rounded,
                         size: 36, color: AppColors.textMuted),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16),
                   Text('No saved addresses',
                       style: GoogleFonts.poppins(
                           fontSize: 15,
                           color: AppColors.textMuted,
                           fontWeight: FontWeight.w500)),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8),
                   Text('Tap + to add one',
                       style: GoogleFonts.poppins(
                           fontSize: 13, color: AppColors.textMuted)),
@@ -151,17 +150,17 @@ class _SavedAddressesScreenState extends State<SavedAddressesScreen> {
               ),
             )
           : ListView.separated(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(20),
               itemCount: _addresses.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 12),
+              separatorBuilder: (_, __) => SizedBox(height: 12),
               itemBuilder: (_, i) {
                 final a = _addresses[i];
                 return Container(
-                  padding: const EdgeInsets.all(16),
+                  padding: EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: AppColors.bgCard,
+                    color: Theme.of(context).colorScheme.surface,
                     borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: AppColors.borderColor),
+                    border: Border.all(color: Theme.of(context).colorScheme.outline),
                   ),
                   child: Row(
                     children: [
@@ -182,7 +181,7 @@ class _SavedAddressesScreenState extends State<SavedAddressesScreen> {
                           size: 20,
                         ),
                       ),
-                      const SizedBox(width: 14),
+                      SizedBox(width: 14),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -191,7 +190,7 @@ class _SavedAddressesScreenState extends State<SavedAddressesScreen> {
                                 style: GoogleFonts.poppins(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w700,
-                                    color: AppColors.textWhite)),
+                                    color: AppColors.textPrimary)),
                             Text(
                               [a['address'], a['city'], a['pincode']]
                                   .where((s) => s != null && s.isNotEmpty)
@@ -204,8 +203,7 @@ class _SavedAddressesScreenState extends State<SavedAddressesScreen> {
                       ),
                       GestureDetector(
                         onTap: () => setState(() => _addresses.removeAt(i)),
-                        child: const Icon(Icons.delete_outline_rounded,
-                            color: AppColors.statusRed, size: 20),
+                        child: Icon(Icons.delete_outline_rounded, color: AppColors.statusRed, size: 20),
                       ),
                     ],
                   ),

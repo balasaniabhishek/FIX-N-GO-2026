@@ -1,5 +1,7 @@
 plugins {
     id("com.android.application")
+    id("com.google.gms.google-services")
+    id("org.jetbrains.kotlin.android")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
 }
@@ -17,24 +19,20 @@ android {
     defaultConfig {
         // Professional Application ID for Fix-N-Go Private Limited
         applicationId = "com.fixngo.customer"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
-        
-        // CRITICAL: x86_64 ONLY - no multiarch, no arm64 (eliminates CMake file lock issues on Windows)
+
+        // Build only arm64-v8a to avoid Windows CMake parallel file-lock conflicts.
+        // This covers 99%+ of modern Android phones (2016 and newer).
         ndk {
-            abiFilters.clear()
-            abiFilters.add("x86_64")
+            abiFilters += listOf("arm64-v8a")
         }
     }
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("debug")
         }
     }

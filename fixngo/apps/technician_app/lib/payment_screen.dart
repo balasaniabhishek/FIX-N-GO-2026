@@ -67,37 +67,37 @@ class _PaymentScreenState extends State<PaymentScreen>
     final price = _job?['estimatedPrice'] ?? 499;
 
     return Scaffold(
-      backgroundColor: AppColors.bg,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         leading: GestureDetector(
           onTap: () => Navigator.pop(context),
           child: Container(
-            margin: const EdgeInsets.all(8),
+            margin: EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: AppColors.card,
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.border),
+              border: Border.all(color: Theme.of(context).colorScheme.outline),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.arrow_back_ios_new_rounded,
               size: 18,
-              color: Colors.white,
+              color: AppColors.textPrimary,
             ),
           ),
         ),
-        title: const Text('Collect Payment'),
+        title: Text('Collect Payment'),
       ),
       body: Stack(
         children: [
           SafeArea(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.all(24),
+                    padding: EdgeInsets.all(24),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
@@ -112,29 +112,29 @@ class _PaymentScreenState extends State<PaymentScreen>
                     ),
                     child: Column(
                       children: [
-                        const Text(
+                        Text(
                           'Amount to Collect',
                           style: TextStyle(color: AppColors.grey, fontSize: 14),
                         ),
-                        const SizedBox(height: 8),
+                        SizedBox(height: 8),
                         Text(
                           '₹$price',
-                          style: const TextStyle(
-                            color: Colors.white,
+                          style: TextStyle(
+                            color: AppColors.textPrimary,
                             fontSize: 48,
                             fontWeight: FontWeight.w900,
                             letterSpacing: -1,
                           ),
                         ),
-                        const SizedBox(height: 4),
-                        const Text(
+                        SizedBox(height: 4),
+                        Text(
                           'Service completed • Collect now',
                           style: TextStyle(color: AppColors.grey, fontSize: 12),
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 28),
+                  SizedBox(height: 28),
                   const SectionLabel('Payment Method'),
                   _paymentOption(
                     'upi',
@@ -143,7 +143,7 @@ class _PaymentScreenState extends State<PaymentScreen>
                     'Google Pay, PhonePe, Paytm',
                     AppColors.orange,
                   ),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10),
                   _paymentOption(
                     'cash',
                     Icons.payments_rounded,
@@ -151,16 +151,16 @@ class _PaymentScreenState extends State<PaymentScreen>
                     'Collect cash directly',
                     AppColors.green,
                   ),
-                  const SizedBox(height: 28),
+                  SizedBox(height: 28),
                   if (_selectedMethod == 'upi') ...[
                     GlassCard(
                       child: Column(
                         children: [
-                          const Text(
+                          Text(
                             'Show this QR to customer',
                             style: TextStyle(color: AppColors.grey, fontSize: 13),
                           ),
-                          const SizedBox(height: 16),
+                          SizedBox(height: 16),
                           Container(
                             width: 180,
                             height: 180,
@@ -168,7 +168,7 @@ class _PaymentScreenState extends State<PaymentScreen>
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(16),
                             ),
-                            child: const Center(
+                            child: Center(
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
@@ -186,43 +186,43 @@ class _PaymentScreenState extends State<PaymentScreen>
                               ),
                             ),
                           ),
-                          const SizedBox(height: 12),
-                          const Text(
+                          SizedBox(height: 12),
+                          Text(
                             'UPI ID: fixer@ybl',
                             style: TextStyle(color: AppColors.grey, fontSize: 12),
                           ),
                         ],
                       ),
                     ),
-                    const SizedBox(height: 28),
+                    SizedBox(height: 28),
                   ],
                   if (_selectedMethod == 'cash') ...[
                     GlassCard(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Row(
+                          Row(
                             children: [
                               Icon(Icons.info_outline_rounded, color: AppColors.yellow, size: 18),
                               SizedBox(width: 8),
                               Text(
                                 'Cash Collection Tips',
                                 style: TextStyle(
-                                  color: Colors.white,
+                                  color: AppColors.textPrimary,
                                   fontWeight: FontWeight.w700,
                                   fontSize: 15,
                                 ),
                               ),
                             ],
                           ),
-                          const SizedBox(height: 12),
+                          SizedBox(height: 12),
                           _tip('Collect exact amount ₹$price'),
                           _tip('Provide receipt to customer'),
                           _tip('Deposit to wallet within 24 hours'),
                         ],
                       ),
                     ),
-                    const SizedBox(height: 28),
+                    SizedBox(height: 28),
                   ],
                   PrimaryButton(
                     label: 'Confirm Payment Received',
@@ -231,7 +231,7 @@ class _PaymentScreenState extends State<PaymentScreen>
                     color: AppColors.green,
                     icon: Icons.check_circle_rounded,
                   ),
-                  const SizedBox(height: 20),
+                  SizedBox(height: 20),
                 ],
               ),
             ),
@@ -239,7 +239,7 @@ class _PaymentScreenState extends State<PaymentScreen>
           if (_success)
             Positioned.fill(
               child: Container(
-                color: AppColors.bg.withValues(alpha: 0.9),
+                color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.9),
                 child: Center(
                   child: ScaleTransition(
                     scale: _successScale,
@@ -254,19 +254,19 @@ class _PaymentScreenState extends State<PaymentScreen>
                             shape: BoxShape.circle,
                             boxShadow: AppShadows.green,
                           ),
-                          child: const Icon(Icons.check_rounded, color: Colors.white, size: 56),
+                          child: Icon(Icons.check_rounded, color: Colors.white, size: 56),
                         ),
-                        const SizedBox(height: 24),
-                        const Text(
+                        SizedBox(height: 24),
+                        Text(
                           'Payment Collected!',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: AppColors.textPrimary,
                             fontSize: 28,
                             fontWeight: FontWeight.w800,
                           ),
                         ),
-                        const SizedBox(height: 8),
-                        const Text(
+                        SizedBox(height: 8),
+                        Text(
                           'Job completed successfully',
                           style: TextStyle(color: AppColors.grey, fontSize: 16),
                         ),
@@ -287,12 +287,12 @@ class _PaymentScreenState extends State<PaymentScreen>
       onTap: () => setState(() => _selectedMethod = value),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: selected ? color.withValues(alpha: 0.08) : AppColors.card,
+          color: selected ? color.withValues(alpha: 0.08) : Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: selected ? color : AppColors.border,
+            color: selected ? color : Theme.of(context).colorScheme.outline,
             width: selected ? 1.5 : 1,
           ),
         ),
@@ -307,22 +307,22 @@ class _PaymentScreenState extends State<PaymentScreen>
               ),
               child: Icon(icon, color: color, size: 22),
             ),
-            const SizedBox(width: 12),
+            SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: AppColors.textPrimary,
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                   Text(
                     subtitle,
-                    style: const TextStyle(color: AppColors.grey, fontSize: 12),
+                    style: TextStyle(color: AppColors.grey, fontSize: 12),
                   ),
                 ],
               ),
@@ -340,7 +340,7 @@ class _PaymentScreenState extends State<PaymentScreen>
                 ),
               ),
               child: selected
-                  ? const Icon(Icons.check_rounded, color: Colors.white, size: 14)
+                  ? Icon(Icons.check_rounded, color: Colors.white, size: 14)
                   : null,
             ),
           ],
@@ -351,15 +351,15 @@ class _PaymentScreenState extends State<PaymentScreen>
 
   Widget _tip(String text) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
+      padding: EdgeInsets.only(bottom: 8),
       child: Row(
         children: [
-          const Icon(Icons.arrow_right_rounded, color: AppColors.yellow, size: 16),
-          const SizedBox(width: 6),
+          Icon(Icons.arrow_right_rounded, color: AppColors.yellow, size: 16),
+          SizedBox(width: 6),
           Expanded(
             child: Text(
               text,
-              style: const TextStyle(color: AppColors.greyLight, fontSize: 13),
+              style: TextStyle(color: AppColors.greyLight, fontSize: 13),
             ),
           ),
         ],

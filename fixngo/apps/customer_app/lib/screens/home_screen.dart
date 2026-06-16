@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import '../providers/auth_provider.dart';
 import '../theme/app_theme.dart';
 import 'notifications_screen.dart';
 import 'select_device_screen.dart';
@@ -9,45 +11,55 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.bgDark,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildHeader(context),
-              _buildHeroCard(context),
-              _buildServicesSection(context),
-              _buildPopularRepairs(context),
-              _buildHowItWorks(context),
-              _buildReviewsSection(context),
-              const SizedBox(height: 20),
-            ],
+    return Consumer<AuthProvider>(
+      builder: (context, auth, _) {
+        final profile = auth.userProfile ?? {};
+        final userName = (profile['name'] as String?)?.isNotEmpty == true
+            ? profile['name'] as String
+            : (profile['email'] as String?) ?? 'there';
+        final userEmail = (profile['email'] as String?) ?? '';
+
+        return Scaffold(
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          body: SafeArea(
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildHeader(context),
+                  _buildHeroCard(context, userName, userEmail),
+                  _buildServicesSection(context),
+                  _buildPopularRepairs(context),
+                  _buildHowItWorks(context),
+                  _buildReviewsSection(context),
+                  SizedBox(height: 20),
+                ],
+              ),
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
   Widget _buildHeader(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+      padding: EdgeInsets.fromLTRB(20, 16, 20, 0),
       child: Row(
         children: [
           Container(
-            width: 42,
-            height: 42,
+            width: 40,
+            height: 40,
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [AppColors.brandBlue, AppColors.accentCyan],
-              ),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(20),
             ),
-            child: const Icon(Icons.build_rounded, color: Colors.white, size: 22),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(20),
+              child: Image.asset('assets/images/logo.png', fit: BoxFit.contain),
+            ),
           ),
-          const SizedBox(width: 12),
+          SizedBox(width: 12),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -55,7 +67,7 @@ class HomeScreen extends StatelessWidget {
                   style: GoogleFonts.poppins(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
-                    color: AppColors.textWhite,
+                    color: Theme.of(context).colorScheme.onSurface,
                   )),
               Text('Doorstep mobile service',
                   style: GoogleFonts.poppins(
@@ -74,13 +86,13 @@ class HomeScreen extends StatelessWidget {
               width: 42,
               height: 42,
               decoration: BoxDecoration(
-                color: AppColors.bgCard,
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppColors.borderColor),
+                border: Border.all(color: Theme.of(context).colorScheme.outline),
               ),
               child: Stack(
                 children: [
-                  const Center(
+                  Center(
                     child: Icon(Icons.notifications_outlined,
                         color: AppColors.textSecondary, size: 22),
                   ),
@@ -90,7 +102,7 @@ class HomeScreen extends StatelessWidget {
                     child: Container(
                       width: 8,
                       height: 8,
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
                         color: AppColors.statusRed,
                         shape: BoxShape.circle,
                       ),
@@ -105,12 +117,14 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildHeroCard(BuildContext context) {
+  Widget _buildHeroCard(BuildContext context, String userName, String userEmail) {
+    // Extract first name for greeting
+    final firstName = userName.contains('@') ? userName.split('@').first : userName.split(' ').first;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+      padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.all(20),
+        padding: EdgeInsets.all(20),
         decoration: BoxDecoration(
           gradient: const LinearGradient(
             begin: Alignment.topLeft,
@@ -131,19 +145,35 @@ class HomeScreen extends StatelessWidget {
           children: [
             Row(
               children: [
-                const Text('👋', style: TextStyle(fontSize: 22)),
-                const SizedBox(width: 8),
-                Text(
-                  'Hi Rahul',
-                  style: GoogleFonts.poppins(
-                    fontSize: 16,
-                    color: Colors.white.withValues(alpha: 0.9),
-                    fontWeight: FontWeight.w500,
+                Text('👋', style: TextStyle(fontSize: 22)),
+                SizedBox(width: 8),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Hi $firstName',
+                        style: GoogleFonts.poppins(
+                          fontSize: 16,
+                          color: Colors.white.withValues(alpha: 0.9),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      if (userEmail.isNotEmpty)
+                        Text(
+                          userEmail,
+                          style: GoogleFonts.poppins(
+                            fontSize: 11,
+                            color: Colors.white.withValues(alpha: 0.6),
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                    ],
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 6),
+            SizedBox(height: 6),
             Text(
               'What needs fixing?',
               style: GoogleFonts.poppins(
@@ -153,19 +183,19 @@ class HomeScreen extends StatelessWidget {
                 height: 1.1,
               ),
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.bolt, color: Colors.white, size: 14),
-                      const SizedBox(width: 4),
+                      Icon(Icons.bolt, color: Colors.white, size: 14),
+                      SizedBox(width: 4),
                       Text(
                         'Doorstep in under 60 min',
                         style: GoogleFonts.poppins(
@@ -187,7 +217,7 @@ class HomeScreen extends StatelessWidget {
 
   Widget _buildServicesSection(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
+      padding: EdgeInsets.fromLTRB(20, 24, 20, 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -196,10 +226,10 @@ class HomeScreen extends StatelessWidget {
             style: GoogleFonts.poppins(
               fontSize: 18,
               fontWeight: FontWeight.w700,
-              color: AppColors.textWhite,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
-          const SizedBox(height: 14),
+          SizedBox(height: 14),
           _ServiceCard(
             icon: Icons.smartphone_rounded,
             title: 'Mobile Repair',
@@ -212,7 +242,7 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
           _ServiceCard(
             icon: Icons.shield_rounded,
             title: 'Screen Guard',
@@ -239,7 +269,7 @@ class HomeScreen extends StatelessWidget {
     ];
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
+      padding: EdgeInsets.fromLTRB(20, 24, 20, 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -248,10 +278,10 @@ class HomeScreen extends StatelessWidget {
             style: GoogleFonts.poppins(
               fontSize: 18,
               fontWeight: FontWeight.w700,
-              color: AppColors.textWhite,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
-          const SizedBox(height: 14),
+          SizedBox(height: 14),
           Row(
             children: repairs.map((r) {
               return Expanded(
@@ -264,17 +294,17 @@ class HomeScreen extends StatelessWidget {
                   ),
                   child: Container(
                     margin: EdgeInsets.only(right: repairs.indexOf(r) < 3 ? 10 : 0),
-                    padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
+                    padding: EdgeInsets.symmetric(vertical: 14, horizontal: 8),
                     decoration: BoxDecoration(
-                      color: AppColors.bgCard,
+                      color: Theme.of(context).colorScheme.surface,
                       borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: AppColors.borderColor),
+                      border: Border.all(color: Theme.of(context).colorScheme.outline),
                     ),
                     child: Column(
                       children: [
                         Icon(r['icon'] as IconData,
                             color: AppColors.brandBlue, size: 26),
-                        const SizedBox(height: 8),
+                        SizedBox(height: 8),
                         Text(
                           r['label'] as String,
                           textAlign: TextAlign.center,
@@ -284,7 +314,7 @@ class HomeScreen extends StatelessWidget {
                             height: 1.3,
                           ),
                         ),
-                        const SizedBox(height: 4),
+                        SizedBox(height: 4),
                         Text(
                           'From ${r['price']}',
                           style: GoogleFonts.poppins(
@@ -313,7 +343,7 @@ class HomeScreen extends StatelessWidget {
     ];
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
+      padding: EdgeInsets.fromLTRB(20, 24, 20, 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -322,16 +352,16 @@ class HomeScreen extends StatelessWidget {
             style: GoogleFonts.poppins(
               fontSize: 18,
               fontWeight: FontWeight.w700,
-              color: AppColors.textWhite,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
-          const SizedBox(height: 14),
+          SizedBox(height: 14),
           Container(
-            padding: const EdgeInsets.all(18),
+            padding: EdgeInsets.all(18),
             decoration: BoxDecoration(
-              color: AppColors.bgCard,
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.borderColor),
+              border: Border.all(color: Theme.of(context).colorScheme.outline),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -356,14 +386,14 @@ class HomeScreen extends StatelessWidget {
                               child: Icon(s['icon'] as IconData,
                                   color: AppColors.brandBlue, size: 22),
                             ),
-                            const SizedBox(height: 8),
+                            SizedBox(height: 8),
                             Text(
                               s['title'] as String,
                               textAlign: TextAlign.center,
                               style: GoogleFonts.poppins(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w600,
-                                color: AppColors.textPrimary,
+                                color: Theme.of(context).colorScheme.onSurface,
                               ),
                             ),
                             Text(
@@ -379,7 +409,7 @@ class HomeScreen extends StatelessWidget {
                         ),
                       ),
                       if (i < steps.length - 1)
-                        const Icon(Icons.arrow_forward_ios,
+                        Icon(Icons.arrow_forward_ios,
                             size: 12, color: AppColors.textMuted),
                     ],
                   ),
@@ -394,7 +424,7 @@ class HomeScreen extends StatelessWidget {
 
   Widget _buildReviewsSection(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
+      padding: EdgeInsets.fromLTRB(20, 24, 20, 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -405,12 +435,12 @@ class HomeScreen extends StatelessWidget {
                 style: GoogleFonts.poppins(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.textWhite,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
               const Spacer(),
-              const Icon(Icons.star, color: AppColors.starYellow, size: 16),
-              const SizedBox(width: 4),
+              Icon(Icons.star, color: AppColors.starYellow, size: 16),
+              SizedBox(width: 4),
               Text('4.9 (2.4k)',
                   style: GoogleFonts.poppins(
                       fontSize: 13,
@@ -418,13 +448,13 @@ class HomeScreen extends StatelessWidget {
                       fontWeight: FontWeight.w600)),
             ],
           ),
-          const SizedBox(height: 14),
+          SizedBox(height: 14),
           SizedBox(
             height: 140,
             child: ListView(
               scrollDirection: Axis.horizontal,
               physics: const BouncingScrollPhysics(),
-              children: const [
+              children: [
                 _ReviewCard(
                   name: 'Arjun S.',
                   review: 'Super fast! Screen replaced in 40 mins at my office.',
@@ -469,11 +499,11 @@ class _ServiceCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(18),
+        padding: EdgeInsets.all(18),
         decoration: BoxDecoration(
-          color: AppColors.bgCard,
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.borderColor),
+          border: Border.all(color: Theme.of(context).colorScheme.outline),
         ),
         child: Row(
           children: [
@@ -486,7 +516,7 @@ class _ServiceCard extends StatelessWidget {
               ),
               child: Icon(icon, color: color, size: 26),
             ),
-            const SizedBox(width: 16),
+            SizedBox(width: 16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -496,7 +526,7 @@ class _ServiceCard extends StatelessWidget {
                     style: GoogleFonts.poppins(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.textWhite,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
                   Text(
@@ -532,12 +562,12 @@ class _ReviewCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: 220,
-      margin: const EdgeInsets.only(right: 12),
-      padding: const EdgeInsets.all(16),
+      margin: EdgeInsets.only(right: 12),
+      padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.bgCard,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.borderColor),
+        border: Border.all(color: Theme.of(context).colorScheme.outline),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -551,23 +581,23 @@ class _ReviewCard extends StatelessWidget {
                     style: GoogleFonts.poppins(
                         color: AppColors.brandBlue, fontWeight: FontWeight.w700)),
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: 8),
               Text(name,
                   style: GoogleFonts.poppins(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.textPrimary)),
+                      color: Theme.of(context).colorScheme.onSurface)),
             ],
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: 8),
           Row(
             children: List.generate(5, (i) => Icon(
               Icons.star,
               size: 13,
-              color: i < rating ? AppColors.starYellow : AppColors.borderColor,
+              color: i < rating ? AppColors.starYellow : Theme.of(context).colorScheme.outline,
             )),
           ),
-          const SizedBox(height: 6),
+          SizedBox(height: 6),
           Expanded(
             child: Text(
               review,

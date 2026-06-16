@@ -23,7 +23,7 @@ class _RateAppScreenState extends State<RateAppScreen> {
   void _submit() {
     if (_rating == 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select a rating')),
+        SnackBar(content: Text('Please select a rating')),
       );
       return;
     }
@@ -33,30 +33,29 @@ class _RateAppScreenState extends State<RateAppScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.bgDark,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: AppColors.bgDark,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         leading: GestureDetector(
           onTap: () => Navigator.pop(context),
           child: Container(
-            margin: const EdgeInsets.all(8),
+            margin: EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: AppColors.bgCard,
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: AppColors.borderColor),
+              border: Border.all(color: Theme.of(context).colorScheme.outline),
             ),
-            child: const Icon(Icons.arrow_back_rounded,
-                color: AppColors.textPrimary, size: 20),
+            child: Icon(Icons.arrow_back_rounded, color: Theme.of(context).colorScheme.onSurface, size: 20),
           ),
         ),
         title: Text('Rate the App',
             style: GoogleFonts.poppins(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
-                color: AppColors.textWhite)),
+                color: AppColors.textPrimary)),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.all(24),
         child: _submitted ? _buildThankYou() : _buildForm(),
       ),
     );
@@ -65,29 +64,29 @@ class _RateAppScreenState extends State<RateAppScreen> {
   Widget _buildForm() {
     return Column(
       children: [
-        const SizedBox(height: 30),
+        SizedBox(height: 30),
         Container(
-          width: 80,
-          height: 80,
+          width: 100,
+          height: 100,
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [AppColors.brandBlue, AppColors.accentCyan],
-            ),
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(50),
           ),
-          child: const Icon(Icons.build_rounded, color: Colors.white, size: 40),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(50),
+            child: Image.asset('assets/images/logo.png', fit: BoxFit.contain),
+          ),
         ),
-        const SizedBox(height: 20),
+        SizedBox(height: 20),
         Text('How is your experience?',
             style: GoogleFonts.poppins(
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
-                color: AppColors.textWhite)),
-        const SizedBox(height: 8),
+                color: AppColors.textPrimary)),
+        SizedBox(height: 8),
         Text('Your feedback helps us improve Fix-N-Go',
             style: GoogleFonts.poppins(
                 fontSize: 14, color: AppColors.textSecondary)),
-        const SizedBox(height: 30),
+        SizedBox(height: 30),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: List.generate(5, (i) {
@@ -95,7 +94,7 @@ class _RateAppScreenState extends State<RateAppScreen> {
             return GestureDetector(
               onTap: () => setState(() => _rating = starIndex),
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 6),
+                padding: EdgeInsets.symmetric(horizontal: 6),
                 child: Icon(
                   starIndex <= _rating
                       ? Icons.star_rounded
@@ -110,7 +109,7 @@ class _RateAppScreenState extends State<RateAppScreen> {
           }),
         ),
         if (_rating > 0) ...[
-          const SizedBox(height: 8),
+          SizedBox(height: 8),
           Text(
             _rating <= 2
                 ? 'We\'ll do better!'
@@ -123,7 +122,7 @@ class _RateAppScreenState extends State<RateAppScreen> {
                 color: AppColors.starYellow),
           ),
         ],
-        const SizedBox(height: 24),
+        SizedBox(height: 24),
         TextField(
           controller: _feedbackCtrl,
           maxLines: 4,
@@ -131,19 +130,19 @@ class _RateAppScreenState extends State<RateAppScreen> {
             hintText: 'Tell us more (optional)...',
             hintStyle: GoogleFonts.poppins(color: AppColors.textMuted),
             filled: true,
-            fillColor: AppColors.bgCard,
+            fillColor: Theme.of(context).colorScheme.surface,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.borderColor),
+              borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.borderColor),
+              borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
             ),
           ),
-          style: GoogleFonts.poppins(color: AppColors.textPrimary, fontSize: 14),
+          style: GoogleFonts.poppins(color: Theme.of(context).colorScheme.onSurface, fontSize: 14),
         ),
-        const SizedBox(height: 24),
+        SizedBox(height: 24),
         SizedBox(
           width: double.infinity,
           child: ElevatedButton(
@@ -151,7 +150,7 @@ class _RateAppScreenState extends State<RateAppScreen> {
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.brandBlue,
               foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 14),
+              padding: EdgeInsets.symmetric(vertical: 14),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12)),
               elevation: 0,
@@ -177,26 +176,25 @@ class _RateAppScreenState extends State<RateAppScreen> {
               color: AppColors.brandGreen.withValues(alpha: 0.15),
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.check_rounded,
-                color: AppColors.brandGreen, size: 50),
+            child: Icon(Icons.check_rounded, color: AppColors.brandGreen, size: 50),
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: 24),
           Text('Thank you!',
               style: GoogleFonts.poppins(
                   fontSize: 24,
                   fontWeight: FontWeight.w800,
-                  color: AppColors.textWhite)),
-          const SizedBox(height: 8),
+                  color: AppColors.textPrimary)),
+          SizedBox(height: 8),
           Text('Your feedback has been recorded.',
               style: GoogleFonts.poppins(
                   fontSize: 14, color: AppColors.textSecondary)),
-          const SizedBox(height: 30),
+          SizedBox(height: 30),
           ElevatedButton(
             onPressed: () => Navigator.pop(context),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.brandBlue,
               foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(
+              padding: EdgeInsets.symmetric(
                   horizontal: 32, vertical: 12),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12)),

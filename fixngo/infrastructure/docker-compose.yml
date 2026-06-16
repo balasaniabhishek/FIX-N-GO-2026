@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  # MQTT Broker (Eclipse Mosquitto)
+  mosquitto:
+    image: eclipse-mosquitto:2.0
+    container_name: fixngo-mosquitto
+    ports:
+      - "1883:1883"   # TCP port for backend
+      - "9001:9001"   # WebSocket port for Flutter apps
+    volumes:
+      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - mosquitto-data:/mosquitto/data
+      - mosquitto-log:/mosquitto/log
+    restart: unless-stopped
+
+  # Map Tile Server (TileServer GL)
+  # Requires a .mbtiles file mounted into /data/
+  tileserver:
+    image: maptiler/tileserver-gl:latest
+    container_name: fixngo-tileserver
+    ports:
+      - "8080:80"
+    volumes:
+      - ./mapdata:/data
+    command: >
+      # NOTE: For this to work, place your downloaded .mbtiles file in ./infrastructure/mapdata/
+      # e.g., "hyderabad.mbtiles" and run: --mbtiles /data/hyderabad.mbtiles
+      --mbtiles /data/map.mbtiles
+    restart: unless-stopped
+
+volumes:
+  mosquitto-data:
+  mosquitto-log:

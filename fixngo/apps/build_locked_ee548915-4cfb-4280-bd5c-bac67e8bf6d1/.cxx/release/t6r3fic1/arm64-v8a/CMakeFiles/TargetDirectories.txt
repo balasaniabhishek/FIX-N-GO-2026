@@ -1,0 +1,2 @@
+C:/Users/MRCE DIGITAL.LIB/Desktop/Fix-N-Go/FIX-N-GO-2026/fixngo/apps/build/.cxx/release/t6r3fic1/arm64-v8a/CMakeFiles/edit_cache.dir
+C:/Users/MRCE DIGITAL.LIB/Desktop/Fix-N-Go/FIX-N-GO-2026/fixngo/apps/build/.cxx/release/t6r3fic1/arm64-v8a/CMakeFiles/rebuild_cache.dir

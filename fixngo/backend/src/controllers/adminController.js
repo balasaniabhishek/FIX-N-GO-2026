@@ -65,7 +65,7 @@ const assignTechnician = async (req, res, next) => {
     }
 
     const { technicianCut, defaultChecklist, pushStatusHistory } = require('../utils/orderHelpers');
-    const { emitNotification } = require('../utils/socketService');
+    const { emitNotification } = require('../utils/mqttService');
 
     order.technicianUser = tech._id;
     order.technician = tech.name;
@@ -125,6 +125,14 @@ const approveTechnician = async (req, res, next) => {
     }
     tech.isOnline = true;
     await tech.save();
+    
+    const { emitNotification } = require('../utils/mqttService');
+    emitNotification(tech._id.toString(), {
+      type: 'kyc_approved',
+      title: 'KYC Approved!',
+      message: 'Your documents have been verified.'
+    });
+
     res.json({ success: true, message: 'Technician approved', data: tech });
   } catch (error) {
     next(error);

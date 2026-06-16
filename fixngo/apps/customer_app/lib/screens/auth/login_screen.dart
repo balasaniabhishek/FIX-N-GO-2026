@@ -46,8 +46,8 @@ class _LoginScreenState extends State<LoginScreen> {
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Login failed. Please check your credentials.'),
+          SnackBar(
+            content: Text(authProvider.errorMessage ?? 'Login failed. Please check your credentials.'),
             backgroundColor: AppColors.statusRed,
           ),
         );
@@ -58,19 +58,19 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.bgDark,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: RadialGradient(
             center: Alignment(0, -0.3),
             radius: 1.3,
-            colors: [Color(0xFF1E293B), AppColors.bgDark],
+            colors: [Color(0xFF1E293B), Theme.of(context).scaffoldBackgroundColor],
           ),
         ),
         child: SafeArea(
           child: Center(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              padding: EdgeInsets.symmetric(horizontal: 24.0),
               child: Form(
                 key: _formKey,
                 child: Column(
@@ -80,13 +80,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     // Brand Logo / Icon
                     Center(
                       child: Container(
-                        width: 72,
-                        height: 72,
+                        width: 100,
+                        height: 100,
                         decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [AppColors.brandBlue, AppColors.accentCyan],
-                          ),
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(50),
                           boxShadow: [
                             BoxShadow(
                               color: AppColors.brandBlue.withValues(alpha: 0.4),
@@ -94,25 +91,24 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ],
                         ),
-                        child: const Icon(
-                          Icons.build_rounded,
-                          size: 36,
-                          color: Colors.white,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(50),
+                          child: Image.asset('assets/images/logo.png', fit: BoxFit.contain),
                         ),
                       ),
                     ),
-                    const SizedBox(height: 24),
+                    SizedBox(height: 24),
                     Text(
                       'Welcome Back',
                       textAlign: TextAlign.center,
                       style: GoogleFonts.poppins(
                         fontSize: 28,
                         fontWeight: FontWeight.w800,
-                        color: AppColors.textWhite,
+                        color: AppColors.textPrimary,
                         letterSpacing: -0.5,
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    SizedBox(height: 8),
                     Text(
                       'Log in to continue to Fix-N-Go',
                       textAlign: TextAlign.center,
@@ -121,25 +117,25 @@ class _LoginScreenState extends State<LoginScreen> {
                         color: AppColors.textSecondary,
                       ),
                     ),
-                    const SizedBox(height: 36),
+                    SizedBox(height: 36),
 
                     // Email Field
                     TextFormField(
                       controller: _emailController,
-                      style: GoogleFonts.poppins(color: AppColors.textPrimary),
+                      style: GoogleFonts.poppins(color: Theme.of(context).colorScheme.onSurface),
                       decoration: InputDecoration(
                         labelText: 'Email Address',
                         labelStyle: GoogleFonts.poppins(color: AppColors.textSecondary),
-                        prefixIcon: const Icon(Icons.email_outlined, color: AppColors.textSecondary),
+                        prefixIcon: Icon(Icons.email_outlined, color: AppColors.textSecondary),
                         filled: true,
-                        fillColor: AppColors.bgCard,
+                        fillColor: Theme.of(context).colorScheme.surface,
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: AppColors.borderColor),
+                          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: AppColors.brandBlue),
+                          borderSide: BorderSide(color: AppColors.brandBlue),
                         ),
                       ),
                       keyboardType: TextInputType.emailAddress,
@@ -150,17 +146,17 @@ class _LoginScreenState extends State<LoginScreen> {
                         return null;
                       },
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: 16),
 
                     // Password Field
                     TextFormField(
                       controller: _passwordController,
-                      style: GoogleFonts.poppins(color: AppColors.textPrimary),
+                      style: GoogleFonts.poppins(color: Theme.of(context).colorScheme.onSurface),
                       obscureText: _obscurePassword,
                       decoration: InputDecoration(
                         labelText: 'Password',
                         labelStyle: GoogleFonts.poppins(color: AppColors.textSecondary),
-                        prefixIcon: const Icon(Icons.lock_outline_rounded, color: AppColors.textSecondary),
+                        prefixIcon: Icon(Icons.lock_outline_rounded, color: AppColors.textSecondary),
                         suffixIcon: IconButton(
                           icon: Icon(
                             _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
@@ -169,14 +165,14 @@ class _LoginScreenState extends State<LoginScreen> {
                           onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
                         ),
                         filled: true,
-                        fillColor: AppColors.bgCard,
+                        fillColor: Theme.of(context).colorScheme.surface,
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: AppColors.borderColor),
+                          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: AppColors.brandBlue),
+                          borderSide: BorderSide(color: AppColors.brandBlue),
                         ),
                       ),
                       validator: (value) {
@@ -205,14 +201,14 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: 16),
 
                     // Login Button
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.brandBlue,
                         foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        padding: EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -220,7 +216,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       onPressed: _isLoading ? null : _submit,
                       child: _isLoading
-                          ? const SizedBox(
+                          ? SizedBox(
                               height: 20,
                               width: 20,
                               child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
@@ -233,7 +229,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             ),
                     ),
-                    const SizedBox(height: 24),
+                    SizedBox(height: 24),
 
                     // Register Switcher
                     Row(

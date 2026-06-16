@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 
 import 'api_service_new.dart';
+import 'utils/mqtt_service.dart';
 import 'widgets/common_widgets.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -26,9 +27,29 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   dynamic _incomingJob;
   late AnimationController _popupCtrl;
 
+  StreamSubscription<Position>? _positionStream;
+
   @override
   void initState() {
     super.initState();
+    MqttService().connect();
+    
+    MqttService().onNotification((data) {
+      if (data['type'] == 'kyc_approved') {
+        _fetchAll();
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(data['title'] ?? 'KYC Approved'),
+              backgroundColor: AppColors.green,
+            ),
+          );
+        }
+      } else if (data['type'] == 'new_order_offer' || data['type'] == 'order_assigned' || data['type'] == 'new_order_broadcast') {
+        _fetchAll();
+      }
+    });
+
     _popupCtrl = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 400),
@@ -40,6 +61,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   void dispose() {
     _countdownTimer?.cancel();
     _popupCtrl.dispose();
+    _positionStream?.cancel();
     super.dispose();
   }
 
@@ -48,6 +70,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     final jobs = await _api.getAvailableJobs();
     final dash = await _api.getDashboard();
     if (!mounted) return;
+    
+    if (dash != null && dash['_id'] != null) {
+      MqttService().subscribeToUserNotifications(dash['_id']);
+    }
+
     setState(() {
       _jobs = jobs;
       _dashboard = dash;
@@ -92,19 +119,34 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         orElse: () => {'_id': id},
       );
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Job accepted!'), backgroundColor: AppColors.green),
+        SnackBar(content: Text('Job accepted!'), backgroundColor: AppColors.green),
       );
       Navigator.pushNamed(context, '/job_detail', arguments: job);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to accept job'), backgroundColor: AppColors.red),
+        SnackBar(content: Text('Failed to accept job'), backgroundColor: AppColors.red),
       );
     }
   }
 
   Future<void> _toggleOnline(bool val) async {
+    if (val) {
+      final verificationStatus = _dashboard?['verification']?['status'] ?? 'unverified';
+      if (verificationStatus != 'verified') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Complete KYC process to earn'),
+            backgroundColor: AppColors.red,
+          ),
+        );
+        return;
+      }
+    }
+
     setState(() => _isOnline = val);
     if (!val) {
+      _positionStream?.cancel();
+      _positionStream = null;
       await _api.updateLocation(0, 0, false);
       return;
     }
@@ -117,10 +159,25 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         if (mounted) setState(() => _isOnline = false);
         return;
       }
+
+      // First time immediate location fetch
       final pos = await Geolocator.getCurrentPosition(
         locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
       );
       await _api.updateLocation(pos.latitude, pos.longitude, true);
+      
+      // Setup stream to broadcast continuously
+      const locationSettings = LocationSettings(
+        accuracy: LocationAccuracy.high,
+        distanceFilter: 5, // update when moved 5 meters
+      );
+      
+      _positionStream = Geolocator.getPositionStream(locationSettings: locationSettings).listen((Position? position) {
+        if (position != null && _isOnline) {
+          _api.updateLocation(position.latitude, position.longitude, true);
+        }
+      });
+
       if (mounted) {
         await _fetchAll();
       }
@@ -132,7 +189,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.bg,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Stack(
         children: [
           SafeArea(
@@ -140,7 +197,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               children: [
                 _buildHeader(),
                 _buildStats(),
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
                 Expanded(child: _buildBody()),
               ],
             ),
@@ -154,35 +211,38 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   Widget _buildHeader() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+      padding: EdgeInsets.fromLTRB(20, 16, 20, 0),
       child: Row(
         children: [
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: _isOnline ? AppColors.green : AppColors.border,
-                width: 2,
+          GestureDetector(
+            onTap: () => Navigator.pushNamed(context, '/profile'),
+            child: Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: _isOnline ? AppColors.green : Theme.of(context).colorScheme.outline,
+                  width: 2,
+                ),
               ),
-            ),
-            child: ClipOval(
-              child: Container(
-                color: AppColors.card,
-                child: const Icon(Icons.person_rounded, color: AppColors.grey, size: 24),
+              child: ClipOval(
+                child: Container(
+                  color: Theme.of(context).colorScheme.surface,
+                  child: Icon(Icons.person_rounded, color: AppColors.grey, size: 24),
+                ),
               ),
             ),
           ),
-          const SizedBox(width: 12),
+          SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   _dashboard?['name'] ?? 'Technician',
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: AppColors.textPrimary,
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
                   ),
@@ -192,7 +252,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     Container(
                       width: 7,
                       height: 7,
-                      margin: const EdgeInsets.only(right: 5),
+                      margin: EdgeInsets.only(right: 5),
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: _isOnline ? AppColors.green : AppColors.grey,
@@ -216,13 +276,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             child: Container(
               width: 40,
               height: 40,
-              margin: const EdgeInsets.only(right: 8),
+              margin: EdgeInsets.only(right: 8),
               decoration: BoxDecoration(
-                color: AppColors.card,
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppColors.border),
+                border: Border.all(color: Theme.of(context).colorScheme.outline),
               ),
-              child: const Icon(Icons.notifications_outlined, color: Colors.white, size: 20),
+              child: Icon(Icons.notifications_outlined, color: AppColors.textPrimary, size: 20),
             ),
           ),
           GestureDetector(
@@ -230,13 +290,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             child: Container(
               width: 40,
               height: 40,
-              margin: const EdgeInsets.only(right: 8),
+              margin: EdgeInsets.only(right: 8),
               decoration: BoxDecoration(
-                color: AppColors.card,
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppColors.border),
+                border: Border.all(color: Theme.of(context).colorScheme.outline),
               ),
-              child: const Icon(Icons.assignment_outlined, color: Colors.white, size: 20),
+              child: Icon(Icons.assignment_outlined, color: AppColors.textPrimary, size: 20),
             ),
           ),
           GestureDetector(
@@ -245,12 +305,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               duration: const Duration(milliseconds: 300),
               width: 56,
               height: 30,
-              padding: const EdgeInsets.all(3),
+              padding: EdgeInsets.all(3),
               decoration: BoxDecoration(
-                color: _isOnline ? AppColors.green : AppColors.card,
+                color: _isOnline ? AppColors.green : Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(15),
                 border: Border.all(
-                  color: _isOnline ? AppColors.green : AppColors.border,
+                  color: _isOnline ? AppColors.green : Theme.of(context).colorScheme.outline,
                 ),
               ),
               child: AnimatedAlign(
@@ -260,7 +320,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 child: Container(
                   width: 22,
                   height: 22,
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     color: Colors.white,
                     shape: BoxShape.circle,
                   ),
@@ -279,13 +339,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     final rating = _dashboard?['rating'] ?? '4.8';
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+      padding: EdgeInsets.fromLTRB(20, 16, 20, 0),
       child: Row(
         children: [
           _statCard('₹$today', "Today's Earn", Icons.currency_rupee_rounded, AppColors.green),
-          const SizedBox(width: 10),
+          SizedBox(width: 10),
           _statCard('$jobs', 'Jobs Done', Icons.check_circle_rounded, AppColors.orange),
-          const SizedBox(width: 10),
+          SizedBox(width: 10),
           _statCard('$rating ★', 'Rating', Icons.star_rounded, AppColors.yellow),
         ],
       ),
@@ -295,28 +355,28 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   Widget _statCard(String value, String label, IconData icon, Color color) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+        padding: EdgeInsets.symmetric(vertical: 14, horizontal: 12),
                     decoration: BoxDecoration(
-                      color: AppColors.card,
+                      color: Theme.of(context).colorScheme.surface,
                       borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: AppColors.border),
+                      border: Border.all(color: Theme.of(context).colorScheme.outline),
                     ),
         child: Column(
           children: [
             Icon(icon, color: color, size: 22),
-            const SizedBox(height: 6),
+            SizedBox(height: 6),
             Text(
               value,
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: AppColors.textPrimary,
                 fontSize: 15,
                 fontWeight: FontWeight.w800,
               ),
             ),
-            const SizedBox(height: 2),
+            SizedBox(height: 2),
             Text(
               label,
-              style: const TextStyle(color: AppColors.grey, fontSize: 10),
+              style: TextStyle(color: AppColors.grey, fontSize: 10),
               textAlign: TextAlign.center,
             ),
           ],
@@ -353,39 +413,104 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   Widget _buildJobsTab() {
     if (_loading) {
-      return const Center(child: CircularProgressIndicator(color: AppColors.red, strokeWidth: 2));
+      return Center(child: CircularProgressIndicator(color: AppColors.electricBlue, strokeWidth: 2));
     }
 
+    // Check KYC status from dashboard
+    final verificationStatus = _dashboard?['verification']?['status'] ?? 'unverified';
+    final isKycVerified = verificationStatus == 'verified';
+
     return RefreshIndicator(
-      color: AppColors.red,
-      backgroundColor: AppColors.card,
+      color: AppColors.electricBlue,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       onRefresh: _fetchAll,
       child: CustomScrollView(
         slivers: [
+          // KYC Pending Banner
+          if (!isKycVerified)
+            SliverPadding(
+              padding: EdgeInsets.fromLTRB(20, 16, 20, 0),
+              sliver: SliverToBoxAdapter(
+                child: GestureDetector(
+                  onTap: () => Navigator.pushNamed(context, '/kyc').then((_) => _fetchAll()),
+                  child: Container(
+                    padding: EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: verificationStatus == 'pending'
+                          ? AppColors.orange.withValues(alpha: 0.08)
+                          : AppColors.red.withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(
+                        color: verificationStatus == 'pending'
+                            ? AppColors.orange.withValues(alpha: 0.4)
+                            : AppColors.red.withValues(alpha: 0.4),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          verificationStatus == 'pending'
+                              ? Icons.hourglass_top_rounded
+                              : Icons.warning_amber_rounded,
+                          color: verificationStatus == 'pending' ? AppColors.orange : AppColors.red,
+                          size: 22,
+                        ),
+                        SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                verificationStatus == 'pending'
+                                    ? 'KYC Under Review'
+                                    : 'Complete KYC to Receive Orders',
+                                style: TextStyle(
+                                  color: verificationStatus == 'pending' ? AppColors.orange : AppColors.red,
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 13,
+                                ),
+                              ),
+                              SizedBox(height: 2),
+                              Text(
+                                verificationStatus == 'pending'
+                                    ? 'Your documents are being verified. You\'ll be notified soon.'
+                                    : 'Tap here to upload your Aadhaar and get verified.',
+                                style: TextStyle(color: AppColors.grey, fontSize: 12),
+                              ),
+                            ],
+                          ),
+                        ),
+                        if (verificationStatus != 'pending')
+                          Icon(Icons.arrow_forward_ios_rounded, color: AppColors.grey, size: 14),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
           SliverPadding(
-            padding: const EdgeInsets.fromLTRB(20, 16, 20, 4),
+            padding: EdgeInsets.fromLTRB(20, 16, 20, 4),
             sliver: SliverToBoxAdapter(
               child: Row(
                 children: [
-                  const Text(
+                  Text(
                     'Available Jobs',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: AppColors.textPrimary,
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  SizedBox(width: 8),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
-                      color: AppColors.red.withValues(alpha: 0.15),
+                      color: AppColors.electricBlue.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
                       '${_jobs.length}',
-                      style: const TextStyle(
-                        color: AppColors.red,
+                      style: TextStyle(color: AppColors.electricBlue,
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
                       ),
@@ -397,10 +522,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           ),
           if (!_isOnline)
             SliverPadding(
-              padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+              padding: EdgeInsets.fromLTRB(20, 8, 20, 0),
               sliver: SliverToBoxAdapter(
                 child: Container(
-                  padding: const EdgeInsets.all(16),
+                  padding: EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       color: AppColors.yellow.withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(14),
@@ -409,7 +534,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   child: Row(
                     children: [
                       Icon(Icons.power_off_rounded, color: AppColors.yellow, size: 20),
-                      const SizedBox(width: 12),
+                      SizedBox(width: 12),
                       const Expanded(
                         child: Text(
                           'Go Online to receive job requests',
@@ -422,7 +547,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               ),
             ),
           if (_jobs.isEmpty)
-            const SliverFillRemaining(
+            SliverFillRemaining(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -430,7 +555,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   SizedBox(height: 16),
                   Text(
                     'No jobs nearby',
-                    style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700),
+                    style: TextStyle(color: AppColors.textPrimary, fontSize: 18, fontWeight: FontWeight.w700),
                   ),
                   SizedBox(height: 8),
                   Text(
@@ -442,7 +567,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             )
           else
             SliverPadding(
-              padding: const EdgeInsets.fromLTRB(20, 12, 20, 100),
+              padding: EdgeInsets.fromLTRB(20, 12, 20, 100),
               sliver: SliverList(
                 delegate: SliverChildBuilderDelegate(
                   (context, i) => _buildJobCard(_jobs[i]),
@@ -464,12 +589,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     return GestureDetector(
       onTap: () => _showIncomingJob(job),
       child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.all(16),
+        margin: EdgeInsets.only(bottom: 12),
+        padding: EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: AppColors.card,
+                      color: Theme.of(context).colorScheme.surface,
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: AppColors.border),
+                      border: Border.all(color: Theme.of(context).colorScheme.outline),
                     ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -480,27 +605,27 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   width: 44,
                   height: 44,
                   decoration: BoxDecoration(
-                    color: AppColors.red.withValues(alpha: 0.12),
+                    color: AppColors.electricBlue.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Icon(Icons.build_rounded, color: AppColors.red, size: 22),
+                  child: Icon(Icons.build_rounded, color: AppColors.electricBlue, size: 22),
                 ),
-                const SizedBox(width: 12),
+                SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         serviceType,
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: TextStyle(
+                          color: AppColors.textPrimary,
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
                       Text(
                         address,
-                        style: const TextStyle(color: AppColors.grey, fontSize: 12),
+                        style: TextStyle(color: AppColors.grey, fontSize: 12),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -512,39 +637,38 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   children: [
                     Text(
                       '₹$price',
-                      style: const TextStyle(
-                        color: AppColors.green,
+                      style: TextStyle(color: AppColors.green,
                         fontSize: 20,
                         fontWeight: FontWeight.w800,
                       ),
                     ),
-                    Text(dist, style: const TextStyle(color: AppColors.grey, fontSize: 12)),
+                    Text(dist, style: TextStyle(color: AppColors.grey, fontSize: 12)),
                   ],
                 ),
               ],
             ),
-            const SizedBox(height: 12),
-            const Divider(color: AppColors.border, height: 1),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
+            Divider(color: Theme.of(context).colorScheme.outline, height: 1),
+            SizedBox(height: 12),
             Row(
               children: [
                 _jobMeta(Icons.smartphone_rounded, job['deviceModel'] ?? 'Device'),
-                const SizedBox(width: 16),
+                SizedBox(width: 16),
                 _jobMeta(Icons.schedule_rounded, job['estimatedTime'] ?? '45 min'),
                 const Spacer(),
                 GestureDetector(
                   onTap: () => _acceptJob(job['_id']),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                     decoration: BoxDecoration(
-                      color: AppColors.green,
+                      color: AppColors.electricBlue,
                       borderRadius: BorderRadius.circular(30),
-                      boxShadow: AppShadows.green,
+                      boxShadow: AppShadows.glow,
                     ),
-                    child: const Text(
+                    child: Text(
                       'Accept',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: AppColors.navyDeep,
                         fontWeight: FontWeight.w700,
                         fontSize: 14,
                       ),
@@ -563,8 +687,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     return Row(
       children: [
         Icon(icon, color: AppColors.grey, size: 14),
-        const SizedBox(width: 4),
-        Text(text, style: const TextStyle(color: AppColors.grey, fontSize: 12)),
+        SizedBox(width: 4),
+        Text(text, style: TextStyle(color: AppColors.grey, fontSize: 12)),
       ],
     );
   }
@@ -592,7 +716,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Widget _buildJobRequestCard() {
-    if (_incomingJob == null) return const SizedBox();
+    if (_incomingJob == null) return SizedBox();
     final job = _incomingJob!;
     final serviceType = job['serviceType'] ?? 'Screen Replacement';
     final price = job['estimatedPrice'] ?? 499;
@@ -600,53 +724,47 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     final address = job['location']?['address'] ?? '12, MG Road, Hyderabad';
 
     return Container(
-      margin: const EdgeInsets.all(16),
+      margin: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppColors.red.withValues(alpha: 0.5), width: 1.5),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.red.withValues(alpha: 0.3),
-            blurRadius: 40,
-            spreadRadius: 0,
-          ),
-        ],
+        border: Border.all(color: AppColors.electricBlue.withValues(alpha: 0.5), width: 1.5),
+        boxShadow: AppShadows.glow,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
             child: LinearProgressIndicator(
               value: _countdown / 20,
-              backgroundColor: AppColors.border,
-              color: _countdown > 8 ? AppColors.green : AppColors.red,
+              backgroundColor: Theme.of(context).colorScheme.outline,
+              color: _countdown > 8 ? AppColors.electricBlue : AppColors.red,
               minHeight: 4,
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(20),
+            padding: EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
-                        color: AppColors.red.withValues(alpha: 0.15),
+                        color: AppColors.electricBlue.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(20),
                       ),
-                      child: const Row(
+                      child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.notifications_active_rounded, color: AppColors.red, size: 14),
+                          Icon(Icons.notifications_active_rounded, color: AppColors.electricBlue, size: 14),
                           SizedBox(width: 4),
                           Text(
                             'NEW JOB REQUEST',
                             style: TextStyle(
-                              color: AppColors.red,
+                              color: AppColors.electricBlue,
                               fontSize: 11,
                               fontWeight: FontWeight.w700,
                               letterSpacing: 0.5,
@@ -679,49 +797,48 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 16),
                 Text(
                   serviceType,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: AppColors.textPrimary,
                     fontSize: 22,
                     fontWeight: FontWeight.w800,
                     letterSpacing: -0.3,
                   ),
                 ),
-                const SizedBox(height: 4),
+                SizedBox(height: 4),
                 Row(
                   children: [
-                    const Icon(Icons.location_on_rounded, color: AppColors.grey, size: 14),
-                    const SizedBox(width: 4),
+                    Icon(Icons.location_on_rounded, color: AppColors.grey, size: 14),
+                    SizedBox(width: 4),
                     Expanded(
                       child: Text(
                         address,
-                        style: const TextStyle(color: AppColors.grey, fontSize: 13),
+                        style: TextStyle(color: AppColors.grey, fontSize: 13),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 16),
                 Row(
                   children: [
                     _infoChip(Icons.route_rounded, dist),
-                    const SizedBox(width: 10),
+                    SizedBox(width: 10),
                     _infoChip(Icons.schedule_rounded, '~45 min'),
                     const Spacer(),
                     Text(
                       '₹$price',
-                      style: const TextStyle(
-                        color: AppColors.green,
+                      style: TextStyle(color: AppColors.green,
                         fontSize: 28,
                         fontWeight: FontWeight.w900,
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 20),
+                SizedBox(height: 20),
                 Row(
                   children: [
                     Expanded(
@@ -730,15 +847,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         child: Container(
                           height: 52,
                           decoration: BoxDecoration(
-                            color: AppColors.card,
+                            color: Theme.of(context).colorScheme.surface,
                             borderRadius: BorderRadius.circular(14),
-                            border: Border.all(color: AppColors.border),
+                            border: Border.all(color: Theme.of(context).colorScheme.outline),
                           ),
-                          child: const Center(
+                          child: Center(
                             child: Text(
                               'Decline',
                               style: TextStyle(
-                                color: Colors.white,
+                                color: AppColors.textPrimary,
                                 fontSize: 15,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -747,7 +864,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         ),
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    SizedBox(width: 12),
                     Expanded(
                       flex: 2,
                       child: GestureDetector(
@@ -759,7 +876,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             borderRadius: BorderRadius.circular(14),
                             boxShadow: AppShadows.green,
                           ),
-                          child: const Center(
+                          child: Center(
                             child: Text(
                               'Accept Job',
                               style: TextStyle(
@@ -784,18 +901,18 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   Widget _infoChip(IconData icon, String text) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: AppColors.card,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: Theme.of(context).colorScheme.outline),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, color: AppColors.grey, size: 13),
-          const SizedBox(width: 4),
-          Text(text, style: const TextStyle(color: AppColors.grey, fontSize: 12)),
+          SizedBox(width: 4),
+          Text(text, style: TextStyle(color: AppColors.grey, fontSize: 12)),
         ],
       ),
     );
@@ -811,8 +928,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surface,
-        border: const Border(top: BorderSide(color: AppColors.border)),
+        color: Theme.of(context).colorScheme.surface,
+        border: Border(top: BorderSide(color: Theme.of(context).colorScheme.outline)),
       ),
       child: SafeArea(
         child: SizedBox(
@@ -841,14 +958,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     children: [
                       Icon(
                         active ? item.activeIcon : item.icon,
-                        color: active ? AppColors.red : AppColors.grey,
+                        color: active ? AppColors.amber : AppColors.grey,
                         size: 24,
                       ),
-                      const SizedBox(height: 3),
+                      SizedBox(height: 3),
                       Text(
                         item.label,
                         style: TextStyle(
-                          color: active ? AppColors.red : AppColors.grey,
+                          color: active ? AppColors.amber : AppColors.grey,
                           fontSize: 10,
                           fontWeight: active ? FontWeight.w700 : FontWeight.w400,
                         ),

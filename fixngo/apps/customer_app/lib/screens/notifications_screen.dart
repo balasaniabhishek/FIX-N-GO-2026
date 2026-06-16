@@ -80,27 +80,26 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.bgDark,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: AppColors.bgDark,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         leading: GestureDetector(
           onTap: () => Navigator.pop(context),
           child: Container(
-            margin: const EdgeInsets.all(8),
+            margin: EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: AppColors.bgCard,
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: AppColors.borderColor),
+              border: Border.all(color: Theme.of(context).colorScheme.outline),
             ),
-            child: const Icon(Icons.arrow_back_rounded,
-                color: AppColors.textPrimary, size: 20),
+            child: Icon(Icons.arrow_back_rounded, color: Theme.of(context).colorScheme.onSurface, size: 20),
           ),
         ),
         title: Text('Notifications',
             style: GoogleFonts.poppins(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
-                color: AppColors.textWhite)),
+                color: AppColors.textPrimary)),
         actions: [
           if (_notifications.any(
               (n) => (n as Map)['read'] != true))
@@ -115,7 +114,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         ],
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator(color: AppColors.brandBlue))
+          ? Center(child: CircularProgressIndicator(color: AppColors.brandBlue))
           : _notifications.isEmpty
               ? _buildEmpty()
               : RefreshIndicator(
@@ -124,9 +123,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   child: ListView.separated(
                     physics: const AlwaysScrollableScrollPhysics(
                         parent: BouncingScrollPhysics()),
-                    padding: const EdgeInsets.all(16),
+                    padding: EdgeInsets.all(16),
                     itemCount: _notifications.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 10),
+                    separatorBuilder: (_, __) => SizedBox(height: 10),
                     itemBuilder: (_, i) {
                       final n = _notifications[i] as Map<String, dynamic>;
                       final read = n['read'] == true;
@@ -136,13 +135,13 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                           if (!read) _markRead(n['_id'] as String, i);
                         },
                         child: Container(
-                          padding: const EdgeInsets.all(14),
+                          padding: EdgeInsets.all(14),
                           decoration: BoxDecoration(
-                            color: read ? AppColors.bgCard : AppColors.bgCardLight,
+                            color: read ? Theme.of(context).colorScheme.surface : Theme.of(context).colorScheme.surface,
                             borderRadius: BorderRadius.circular(14),
                             border: Border.all(
                               color: read
-                                  ? AppColors.borderColor
+                                  ? Theme.of(context).colorScheme.outline
                                   : AppColors.brandBlue.withValues(alpha: 0.3),
                             ),
                           ),
@@ -158,7 +157,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                                 child: Icon(_iconFor(type),
                                     color: AppColors.brandBlue, size: 20),
                               ),
-                              const SizedBox(width: 12),
+                              SizedBox(width: 12),
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -168,12 +167,12 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                                       style: GoogleFonts.poppins(
                                         fontSize: 14,
                                         fontWeight: read ? FontWeight.w500 : FontWeight.w700,
-                                        color: AppColors.textWhite,
+                                        color: AppColors.textPrimary,
                                       ),
                                     ),
                                     if (n['message'] != null)
                                       Padding(
-                                        padding: const EdgeInsets.only(top: 2),
+                                        padding: EdgeInsets.only(top: 2),
                                         child: Text(
                                           n['message'] as String,
                                           maxLines: 2,
@@ -191,7 +190,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                                 Container(
                                   width: 8,
                                   height: 8,
-                                  decoration: const BoxDecoration(
+                                  decoration: BoxDecoration(
                                     color: AppColors.brandBlue,
                                     shape: BoxShape.circle,
                                   ),
@@ -215,14 +214,14 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             width: 80,
             height: 80,
             decoration: BoxDecoration(
-              color: AppColors.bgCard,
+              color: Theme.of(context).colorScheme.surface,
               shape: BoxShape.circle,
-              border: Border.all(color: AppColors.borderColor),
+              border: Border.all(color: Theme.of(context).colorScheme.outline),
             ),
-            child: const Icon(Icons.notifications_off_rounded,
+            child: Icon(Icons.notifications_off_rounded,
                 size: 36, color: AppColors.textMuted),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
           Text('No notifications yet',
               style: GoogleFonts.poppins(
                   fontSize: 15,

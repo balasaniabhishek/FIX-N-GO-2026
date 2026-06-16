@@ -26,21 +26,20 @@ class LanguageScreen extends StatelessWidget {
     final selected = localeProvider.languageCode;
 
     return Scaffold(
-      backgroundColor: AppColors.bgDark,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: AppColors.bgDark,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         leading: GestureDetector(
           onTap: () => Navigator.pop(context),
           child: Container(
-            margin: const EdgeInsets.all(8),
+            margin: EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: AppColors.bgCard,
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: AppColors.borderColor),
+              border: Border.all(color: Theme.of(context).colorScheme.outline),
             ),
-            child: const Icon(Icons.arrow_back_rounded,
-                color: AppColors.textPrimary, size: 20),
+            child: Icon(Icons.arrow_back_rounded, color: Theme.of(context).colorScheme.onSurface, size: 20),
           ),
         ),
         title: Text(
@@ -48,15 +47,15 @@ class LanguageScreen extends StatelessWidget {
           style: GoogleFonts.poppins(
               fontSize: 18,
               fontWeight: FontWeight.w700,
-              color: AppColors.textWhite),
+              color: AppColors.textPrimary),
         ),
       ),
       body: Column(
         children: [
           // Info banner
           Container(
-            margin: const EdgeInsets.fromLTRB(20, 8, 20, 0),
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            margin: EdgeInsets.fromLTRB(20, 8, 20, 0),
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
               color: AppColors.brandBlue.withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(12),
@@ -65,9 +64,8 @@ class LanguageScreen extends StatelessWidget {
             ),
             child: Row(
               children: [
-                const Icon(Icons.translate_rounded,
-                    color: AppColors.brandBlue, size: 18),
-                const SizedBox(width: 10),
+                Icon(Icons.translate_rounded, color: AppColors.brandBlue, size: 18),
+                SizedBox(width: 10),
                 Expanded(
                   child: Text(
                     'Tap a language to apply it instantly across the app.',
@@ -79,15 +77,15 @@ class LanguageScreen extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
 
           // Language list
           Expanded(
             child: ListView.separated(
               physics: const BouncingScrollPhysics(),
-              padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+              padding: EdgeInsets.fromLTRB(20, 0, 20, 20),
               itemCount: _languages.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 10),
+              separatorBuilder: (_, __) => SizedBox(height: 10),
               itemBuilder: (_, i) {
                 final lang = _languages[i];
                 final isSelected = lang['code'] == selected;
@@ -104,8 +102,8 @@ class LanguageScreen extends StatelessWidget {
                           content: Row(
                             children: [
                               Text(lang['flag']!,
-                                  style: const TextStyle(fontSize: 20)),
-                              const SizedBox(width: 10),
+                                  style: TextStyle(fontSize: 20)),
+                              SizedBox(width: 10),
                               Text(
                                 '${lang['native']} applied!',
                                 style: GoogleFonts.poppins(
@@ -124,16 +122,16 @@ class LanguageScreen extends StatelessWidget {
                   },
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
-                    padding: const EdgeInsets.all(16),
+                    padding: EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       color: isSelected
                           ? AppColors.brandBlue.withValues(alpha: 0.08)
-                          : AppColors.bgCard,
+                          : Theme.of(context).colorScheme.surface,
                       borderRadius: BorderRadius.circular(14),
                       border: Border.all(
                         color: isSelected
                             ? AppColors.brandBlue
-                            : AppColors.borderColor,
+                            : Theme.of(context).colorScheme.outline,
                         width: isSelected ? 1.5 : 1,
                       ),
                     ),
@@ -146,17 +144,17 @@ class LanguageScreen extends StatelessWidget {
                           decoration: BoxDecoration(
                             color: isSelected
                                 ? AppColors.brandBlue.withValues(alpha: 0.15)
-                                : AppColors.bgCardLight,
+                                : Theme.of(context).colorScheme.surface,
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Center(
                             child: Text(
                               lang['flag']!,
-                              style: const TextStyle(fontSize: 22),
+                              style: TextStyle(fontSize: 22),
                             ),
                           ),
                         ),
-                        const SizedBox(width: 14),
+                        SizedBox(width: 14),
 
                         // Names
                         Expanded(
@@ -170,7 +168,7 @@ class LanguageScreen extends StatelessWidget {
                                   fontWeight: FontWeight.w700,
                                   color: isSelected
                                       ? AppColors.brandBlue
-                                      : AppColors.textWhite,
+                                      : Colors.white,
                                 ),
                               ),
                               Text(
@@ -187,7 +185,7 @@ class LanguageScreen extends StatelessWidget {
                         // Selected indicator
                         if (isSelected)
                           Container(
-                            padding: const EdgeInsets.symmetric(
+                            padding: EdgeInsets.symmetric(
                                 horizontal: 10, vertical: 4),
                             decoration: BoxDecoration(
                               color: AppColors.brandBlue,
@@ -196,9 +194,9 @@ class LanguageScreen extends StatelessWidget {
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                const Icon(Icons.check_rounded,
+                                Icon(Icons.check_rounded,
                                     color: Colors.white, size: 14),
-                                const SizedBox(width: 4),
+                                SizedBox(width: 4),
                                 Text('Active',
                                     style: GoogleFonts.poppins(
                                       fontSize: 11,

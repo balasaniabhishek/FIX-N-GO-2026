@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../services/socket_service.dart';
+import '../services/mqtt_service.dart';
 import '../theme/app_theme.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -20,7 +20,7 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-  final SocketService _socketService = SocketService();
+  final MqttService _socketService = MqttService();
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   final List<Map<String, dynamic>> _messages = [];
@@ -93,11 +93,11 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.bgDark,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: AppColors.bgCard,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary),
+          icon: Icon(Icons.arrow_back_ios_new_rounded, color: Theme.of(context).colorScheme.onSurface),
           onPressed: () => Navigator.pop(context),
         ),
         title: Column(
@@ -108,7 +108,7 @@ class _ChatScreenState extends State<ChatScreen> {
               style: GoogleFonts.poppins(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: AppColors.textWhite,
+                color: AppColors.textPrimary,
               ),
             ),
             Text(
@@ -123,7 +123,7 @@ class _ChatScreenState extends State<ChatScreen> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.phone_rounded, color: AppColors.textSecondary),
+            icon: Icon(Icons.phone_rounded, color: AppColors.textSecondary),
             onPressed: () {},
           ),
         ],
@@ -138,7 +138,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(Icons.chat_bubble_outline_rounded, size: 48, color: AppColors.textMuted.withValues(alpha: 0.5)),
-                          const SizedBox(height: 12),
+                          SizedBox(height: 12),
                           Text(
                             'Start conversation with ${widget.recipientName}',
                             style: GoogleFonts.poppins(color: AppColors.textMuted),
@@ -148,7 +148,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     )
                   : ListView.builder(
                       controller: _scrollController,
-                      padding: const EdgeInsets.all(16),
+                      padding: EdgeInsets.all(16),
                       itemCount: _messages.length,
                       itemBuilder: (context, index) {
                         final msg = _messages[index];
@@ -156,17 +156,17 @@ class _ChatScreenState extends State<ChatScreen> {
                         return Align(
                           alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
                           child: Container(
-                            margin: const EdgeInsets.symmetric(vertical: 4),
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                            margin: EdgeInsets.symmetric(vertical: 4),
+                            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                             decoration: BoxDecoration(
-                              color: isMe ? AppColors.brandBlue : AppColors.bgCard,
+                              color: isMe ? AppColors.brandBlue : Theme.of(context).colorScheme.surface,
                               borderRadius: BorderRadius.only(
                                 topLeft: const Radius.circular(16),
                                 topRight: const Radius.circular(16),
                                 bottomLeft: Radius.circular(isMe ? 16 : 0),
                                 bottomRight: Radius.circular(isMe ? 0 : 16),
                               ),
-                              border: Border.all(color: isMe ? Colors.transparent : AppColors.borderColor),
+                              border: Border.all(color: isMe ? Colors.transparent : Theme.of(context).colorScheme.outline),
                             ),
                             constraints: BoxConstraints(
                               maxWidth: MediaQuery.of(context).size.width * 0.75,
@@ -174,7 +174,7 @@ class _ChatScreenState extends State<ChatScreen> {
                             child: Text(
                               msg['message'],
                               style: GoogleFonts.poppins(
-                                color: AppColors.textWhite,
+                                color: AppColors.textPrimary,
                                 fontSize: 14,
                               ),
                             ),
@@ -186,17 +186,17 @@ class _ChatScreenState extends State<ChatScreen> {
 
             // Input Bar
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: AppColors.bgCard,
-                border: Border(top: BorderSide(color: AppColors.borderColor)),
+                color: Theme.of(context).colorScheme.surface,
+                border: Border(top: BorderSide(color: Theme.of(context).colorScheme.outline)),
               ),
               child: Row(
                 children: [
                   Expanded(
                     child: TextField(
                       controller: _messageController,
-                      style: GoogleFonts.poppins(color: AppColors.textPrimary),
+                      style: GoogleFonts.poppins(color: Theme.of(context).colorScheme.onSurface),
                       decoration: InputDecoration(
                         hintText: 'Type your message...',
                         hintStyle: GoogleFonts.poppins(color: AppColors.textMuted),
@@ -205,16 +205,16 @@ class _ChatScreenState extends State<ChatScreen> {
                       onSubmitted: (_) => _sendMessage(),
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  SizedBox(width: 8),
                   GestureDetector(
                     onTap: _sendMessage,
                     child: Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: const BoxDecoration(
+                      padding: EdgeInsets.all(12),
+                      decoration: BoxDecoration(
                         color: AppColors.brandBlue,
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.send_rounded,
                         color: Colors.white,
                         size: 20,

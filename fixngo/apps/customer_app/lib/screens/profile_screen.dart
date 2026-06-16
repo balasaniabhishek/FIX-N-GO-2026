@@ -13,6 +13,7 @@ import 'rate_app_screen.dart';
 import 'saved_addresses_screen.dart';
 import 'support_chat_screen.dart';
 import '../theme/app_theme.dart';
+import '../providers/theme_provider.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -28,10 +29,10 @@ class ProfileScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: AppColors.bgCard,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         title: Text(
           'Edit Profile',
-          style: GoogleFonts.poppins(color: AppColors.textWhite, fontWeight: FontWeight.bold),
+          style: GoogleFonts.poppins(color: AppColors.textPrimary, fontWeight: FontWeight.bold),
         ),
         content: SingleChildScrollView(
           child: Column(
@@ -40,31 +41,31 @@ class ProfileScreen extends StatelessWidget {
               TextField(
                 controller: nameController,
                 decoration: const InputDecoration(labelText: 'Name'),
-                style: const TextStyle(color: AppColors.textPrimary),
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
               ),
-              const SizedBox(height: 8),
+              SizedBox(height: 8),
               TextField(
                 controller: phoneController,
                 decoration: const InputDecoration(labelText: 'Phone'),
-                style: const TextStyle(color: AppColors.textPrimary),
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
               ),
-              const SizedBox(height: 8),
+              SizedBox(height: 8),
               TextField(
                 controller: addressController,
                 decoration: const InputDecoration(labelText: 'Address'),
-                style: const TextStyle(color: AppColors.textPrimary),
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
               ),
-              const SizedBox(height: 8),
+              SizedBox(height: 8),
               TextField(
                 controller: cityController,
                 decoration: const InputDecoration(labelText: 'City'),
-                style: const TextStyle(color: AppColors.textPrimary),
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
               ),
-              const SizedBox(height: 8),
+              SizedBox(height: 8),
               TextField(
                 controller: pincodeController,
                 decoration: const InputDecoration(labelText: 'Pincode'),
-                style: const TextStyle(color: AppColors.textPrimary),
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
               ),
             ],
           ),
@@ -72,7 +73,7 @@ class ProfileScreen extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel'),
+            child: Text('Cancel'),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -87,12 +88,12 @@ class ProfileScreen extends StatelessWidget {
                 Navigator.pop(ctx);
                 if (!success) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Failed to update profile')),
+                    SnackBar(content: Text('Failed to update profile')),
                   );
                 }
               }
             },
-            child: const Text('Save'),
+            child: Text('Save'),
           ),
         ],
       ),
@@ -106,12 +107,12 @@ class ProfileScreen extends StatelessWidget {
     return Consumer<AuthProvider>(
       builder: (context, auth, _) {
         final profile = auth.userProfile ?? {};
-        final name = profile['name'] as String? ?? 'Rahul Sharma';
-        final phone = profile['phone'] as String? ?? '+91 98765 43210';
+        final name = profile['name'] as String? ?? 'Customer';
+        final phone = profile['phone'] as String? ?? '';
         final email = profile['email'] as String? ?? '';
 
         return Scaffold(
-          backgroundColor: AppColors.bgDark,
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           body: SafeArea(
             child: SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
@@ -120,12 +121,12 @@ class ProfileScreen extends StatelessWidget {
                   // Header gradient
                   Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.fromLTRB(20, 20, 20, 30),
-                    decoration: const BoxDecoration(
+                    padding: EdgeInsets.fromLTRB(20, 20, 20, 30),
+                    decoration: BoxDecoration(
                       gradient: LinearGradient(
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
-                        colors: [Color(0xFF1A2A4A), AppColors.bgDark],
+                        colors: [Color(0xFF1A2A4A), Theme.of(context).scaffoldBackgroundColor],
                       ),
                     ),
                     child: Column(
@@ -137,24 +138,24 @@ class ProfileScreen extends StatelessWidget {
                                 style: GoogleFonts.poppins(
                                   fontSize: 26,
                                   fontWeight: FontWeight.w800,
-                                  color: AppColors.textWhite,
+                                  color: AppColors.textPrimary,
                                 )),
                             GestureDetector(
                               onTap: () => _showEditProfileDialog(context, auth),
                               child: Container(
-                                padding: const EdgeInsets.all(8),
+                                padding: EdgeInsets.all(8),
                                 decoration: BoxDecoration(
-                                  color: AppColors.bgCard,
+                                  color: Theme.of(context).colorScheme.surface,
                                   borderRadius: BorderRadius.circular(10),
-                                  border: Border.all(color: AppColors.borderColor),
+                                  border: Border.all(color: Theme.of(context).colorScheme.outline),
                                 ),
-                                child: const Icon(Icons.edit_rounded,
+                                child: Icon(Icons.edit_rounded,
                                     size: 18, color: AppColors.textSecondary),
                               ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 24),
+                        SizedBox(height: 24),
                         // Avatar
                         Stack(
                           children: [
@@ -167,9 +168,9 @@ class ProfileScreen extends StatelessWidget {
                                 ),
                                 shape: BoxShape.circle,
                                 border: Border.all(
-                                    color: AppColors.bgDark, width: 3),
+                                    color: Theme.of(context).scaffoldBackgroundColor, width: 3),
                               ),
-                              child: const Icon(Icons.person_rounded,
+                              child: Icon(Icons.person_rounded,
                                   color: Colors.white, size: 44),
                             ),
                             Positioned(
@@ -182,38 +183,39 @@ class ProfileScreen extends StatelessWidget {
                                   color: AppColors.brandGreen,
                                   shape: BoxShape.circle,
                                   border: Border.all(
-                                      color: AppColors.bgDark, width: 2),
+                                      color: Theme.of(context).scaffoldBackgroundColor, width: 2),
                                 ),
-                                child: const Icon(Icons.verified,
+                                child: Icon(Icons.verified,
                                     size: 14, color: Colors.white),
                               ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 12),
+                        SizedBox(height: 12),
                         Text(name,
                             style: GoogleFonts.poppins(
                               fontSize: 22,
                               fontWeight: FontWeight.w700,
-                              color: AppColors.textWhite,
+                              color: AppColors.textPrimary,
                             )),
-                        Text(phone.isNotEmpty ? phone : email,
-                            style: GoogleFonts.poppins(
-                              fontSize: 14,
-                              color: AppColors.textSecondary,
-                            )),
-                        const SizedBox(height: 20),
+                        if (email.isNotEmpty)
+                          Text(email,
+                              style: GoogleFonts.poppins(
+                                fontSize: 14,
+                                color: AppColors.textSecondary,
+                              )),
+                        if (phone.isNotEmpty)
+                          Text(phone,
+                              style: GoogleFonts.poppins(
+                                fontSize: 13,
+                                color: AppColors.textMuted,
+                              )),
+                        SizedBox(height: 20),
                         // Stats row
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             _StatItem(value: '7', label: l10n.repairs),
-                            Container(
-                                width: 1, height: 36, color: AppColors.borderColor),
-                            _StatItem(value: '₹3,495', label: l10n.saved),
-                            Container(
-                                width: 1, height: 36, color: AppColors.borderColor),
-                            _StatItem(value: '4.9★', label: l10n.rating),
                           ],
                         ),
                       ],
@@ -221,7 +223,7 @@ class ProfileScreen extends StatelessWidget {
                   ),
                   // Menu items
                   Padding(
-                    padding: const EdgeInsets.all(20),
+                    padding: EdgeInsets.all(20),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -245,7 +247,7 @@ class ProfileScreen extends StatelessWidget {
                                     MaterialPageRoute(builder: (_) => const PaymentMethodsScreen()))),
                           ],
                         ),
-                        const SizedBox(height: 20),
+                        SizedBox(height: 20),
                         _MenuSection(
                           title: l10n.support,
                           items: [
@@ -266,10 +268,22 @@ class ProfileScreen extends StatelessWidget {
                                     MaterialPageRoute(builder: (_) => const RateAppScreen()))),
                           ],
                         ),
-                        const SizedBox(height: 20),
+                        SizedBox(height: 20),
                         _MenuSection(
                           title: l10n.preferences,
                           items: [
+                            _MenuItem(
+                                icon: Icons.dark_mode_outlined,
+                                label: 'Dark Mode',
+                                trailing: Consumer<ThemeProvider>(
+                                  builder: (ctx, theme, _) => Switch(
+                                    value: theme.isDark,
+                                    onChanged: (_) => theme.toggle(),
+                                    activeThumbColor: AppColors.brandBlue,
+                                    activeTrackColor: AppColors.brandBlue.withValues(alpha: 0.4),
+                                  ),
+                                ),
+                                onTap: () => context.read<ThemeProvider>().toggle()),
                             _MenuItem(
                                 icon: Icons.notifications_outlined,
                                 label: l10n.notifications,
@@ -289,7 +303,7 @@ class ProfileScreen extends StatelessWidget {
                                     MaterialPageRoute(builder: (_) => const LanguageScreen()))),
                           ],
                         ),
-                        const SizedBox(height: 20),
+                        SizedBox(height: 20),
                         // Logout button
                         GestureDetector(
                           onTap: () async {
@@ -303,7 +317,7 @@ class ProfileScreen extends StatelessWidget {
                           },
                           child: Container(
                             width: double.infinity,
-                            padding: const EdgeInsets.all(16),
+                            padding: EdgeInsets.all(16),
                             decoration: BoxDecoration(
                               color: AppColors.statusRed.withValues(alpha: 0.08),
                               borderRadius: BorderRadius.circular(14),
@@ -313,9 +327,8 @@ class ProfileScreen extends StatelessWidget {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                const Icon(Icons.logout_rounded,
-                                    color: AppColors.statusRed, size: 20),
-                                const SizedBox(width: 10),
+                                Icon(Icons.logout_rounded, color: AppColors.statusRed, size: 20),
+                                SizedBox(width: 10),
                                 Text(l10n.logout,
                                     style: GoogleFonts.poppins(
                                       fontSize: 15,
@@ -326,7 +339,7 @@ class ProfileScreen extends StatelessWidget {
                             ),
                           ),
                         ),
-                        const SizedBox(height: 12),
+                        SizedBox(height: 12),
                         Center(
                           child: Text(l10n.version,
                               style: GoogleFonts.poppins(
@@ -361,7 +374,7 @@ class _StatItem extends StatelessWidget {
             style: GoogleFonts.poppins(
               fontSize: 18,
               fontWeight: FontWeight.w800,
-              color: AppColors.textWhite,
+              color: AppColors.textPrimary,
             )),
         Text(label,
             style: GoogleFonts.poppins(
@@ -391,12 +404,12 @@ class _MenuSection extends StatelessWidget {
               color: AppColors.textMuted,
               letterSpacing: 0.5,
             )),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         Container(
           decoration: BoxDecoration(
-            color: AppColors.bgCard,
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppColors.borderColor),
+            border: Border.all(color: Theme.of(context).colorScheme.outline),
           ),
           child: Column(
             children: items.asMap().entries.map((entry) {
@@ -407,9 +420,9 @@ class _MenuSection extends StatelessWidget {
                   item,
                   if (i < items.length - 1)
                     Container(
-                      margin: const EdgeInsets.only(left: 56),
+                      margin: EdgeInsets.only(left: 56),
                       height: 1,
-                      color: AppColors.borderColor,
+                      color: Theme.of(context).colorScheme.outline,
                     ),
                 ],
               );
@@ -441,31 +454,31 @@ class _MenuItem extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         child: Row(
           children: [
             Container(
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: AppColors.bgDark,
+                color: Theme.of(context).scaffoldBackgroundColor,
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: AppColors.borderColor),
+                border: Border.all(color: Theme.of(context).colorScheme.outline),
               ),
               child: Icon(icon, size: 18, color: AppColors.brandBlue),
             ),
-            const SizedBox(width: 14),
+            SizedBox(width: 14),
             Expanded(
               child: Text(label,
                   style: GoogleFonts.poppins(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
-                    color: AppColors.textPrimary,
+                    color: Theme.of(context).colorScheme.onSurface,
                   )),
             ),
             if (badge != null)
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 3),
                 decoration: BoxDecoration(
                   color: AppColors.brandBlue.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(8),
@@ -479,7 +492,7 @@ class _MenuItem extends StatelessWidget {
               ),
             if (trailing != null) trailing!,
             if (badge == null && trailing == null)
-              const Icon(Icons.chevron_right_rounded,
+              Icon(Icons.chevron_right_rounded,
                   size: 18, color: AppColors.textMuted),
           ],
         ),

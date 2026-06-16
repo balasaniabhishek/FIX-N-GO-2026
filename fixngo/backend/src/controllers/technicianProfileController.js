@@ -71,7 +71,7 @@ const updateTechnicianProfile = async (req, res, next) => {
       });
     }
 
-    const { experience, specialization, emoji, documents, profilePhoto } = req.body;
+    const { experience, specialization, emoji, documents, profilePhoto, bankDetails } = req.body;
 
     const technician = await User.findById(req.user._id);
     if (!technician) {
@@ -108,6 +108,13 @@ const updateTechnicianProfile = async (req, res, next) => {
           aadhaarVerified: false,
         };
       }
+    }
+
+    if (bankDetails) {
+      technician.technicianMeta.bankDetails = {
+        ...technician.technicianMeta.bankDetails,
+        ...bankDetails,
+      };
     }
 
     await technician.save();

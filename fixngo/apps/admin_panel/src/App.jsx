@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import Dashboard from './pages/Dashboard';
@@ -48,9 +48,9 @@ function Orders() {
               <tr><td colSpan="5" style={{ textAlign: 'center', color: 'var(--text-muted)' }}>No orders found.</td></tr>
             ) : (
               orders.map(order => (
-                <React.Fragment key={order._id}>
+                <React.Fragment key={order._id || Math.random()}>
                   <tr>
-                    <td style={{ fontFamily: 'monospace' }}>{order._id.substring(0,8)}...</td>
+                    <td style={{ fontFamily: 'monospace' }}>{order._id?.toString().substring(0,8) || 'N/A'}...</td>
                     <td>
                       <span className={`badge badge-${order.status === 'completed' ? 'success' : order.status === 'pending' ? 'warning' : 'info'}`}>
                         {order.status}
