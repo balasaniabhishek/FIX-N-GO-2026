@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
 import Technicians from './pages/Technicians';
 import Withdrawals from './pages/Withdrawals';
+import Monitoring from './pages/Monitoring';
 import './index.css';
 import api from './api';
 
@@ -161,6 +162,7 @@ function App() {
             <Route path="/users" element={<Users />} />
             <Route path="/technicians" element={<Technicians />} />
             <Route path="/withdrawals" element={<Withdrawals />} />
+            <Route path="/monitoring" element={<Monitoring />} />
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </main>

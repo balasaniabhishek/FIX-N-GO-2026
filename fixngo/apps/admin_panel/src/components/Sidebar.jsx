@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, ListOrdered, Users, Wrench, LogOut, UserCog, Wallet } from 'lucide-react';
+import { LayoutDashboard, ListOrdered, Users, Wrench, LogOut, UserCog, Wallet, Radio } from 'lucide-react';
 
 export default function Sidebar() {
   const handleLogout = () => {
@@ -33,6 +33,10 @@ export default function Sidebar() {
         <NavLink to="/withdrawals" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
           <Wallet size={20} />
           Withdrawals
+        </NavLink>
+        <NavLink to="/monitoring" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+          <Radio size={20} />
+          Live Monitoring
         </NavLink>
       </nav>
       <div style={{ marginTop: 'auto', padding: '1.5rem', borderTop: '1px solid var(--border-light)' }}>
