@@ -48,6 +48,9 @@ const userSchema = mongoose.Schema(
       verification: {
         status: { type: String, enum: ['unverified', 'pending', 'verified', 'rejected'], default: 'unverified' },
         aadhaarVerified: { type: Boolean, default: false },
+        rejectionReason: { type: String, default: '' },
+        verifiedAt: { type: Date, default: null },
+        rejectedAt: { type: Date, default: null },
       },
       walletBalance: { type: Number, default: 0 },
       pendingEarnings: { type: Number, default: 0 },
